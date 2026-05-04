@@ -3,18 +3,20 @@ package Vista.controllers;
 import Modelo.Cliente;
 import Modelo.ClientePremium;
 import Controlador.Controlador;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.beans.property.SimpleStringProperty;
+
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
  * Controlador encargado de la gestión de la vista de clientes.
- * Permite mostrar, filtrar y gestionar la tabla de clientes estándar y premium.
+ * Permite mostrar, filtrar, buscar y gestionar la tabla de clientes estándar y premium.
  */
 public class GestionClientesController extends GenericoController<Cliente> {
 
@@ -40,9 +42,7 @@ public class GestionClientesController extends GenericoController<Cliente> {
         colDomicilio.setCellValueFactory(new PropertyValueFactory<>("domicilio"));
 
         colTipo.setCellValueFactory(cellData ->
-                new SimpleStringProperty(
-                        (cellData.getValue() instanceof ClientePremium) ? "Premium" : "Estándar"
-                )
+                new SimpleStringProperty(obtenerTipoCliente(cellData.getValue()))
         );
 
         colCuota.setCellValueFactory(cellData ->
@@ -59,6 +59,7 @@ public class GestionClientesController extends GenericoController<Cliente> {
 
         comboFiltro.getItems().clear();
         comboFiltro.getItems().addAll("Todos", "Premium", "Estándar");
+
         tvTabla.setPlaceholder(new Label("Selecciona un filtro para visualizar los clientes."));
     }
 
@@ -78,10 +79,12 @@ public class GestionClientesController extends GenericoController<Cliente> {
                 listaFiltrada = todos.stream()
                         .filter(c -> !(c instanceof ClientePremium))
                         .collect(Collectors.toList());
+
             } else if ("Premium".equals(seleccion)) {
                 listaFiltrada = todos.stream()
                         .filter(c -> c instanceof ClientePremium)
                         .collect(Collectors.toList());
+
             } else {
                 listaFiltrada = todos;
             }
@@ -100,8 +103,65 @@ public class GestionClientesController extends GenericoController<Cliente> {
         }
     }
 
+    /**
+     * Realiza una búsqueda optimizada de clientes por nombre, email, NIF,
+     * domicilio, tipo de cliente o identificador interno.
+     *
+     * La búsqueda ignora mayúsculas y minúsculas para facilitar el uso de la interfaz.
+     *
+     * @param texto texto introducido por el usuario en el buscador
+     */
     @Override
-    protected void realizarBusquedaEspecifica(String texto) {}
+    protected void realizarBusquedaEspecifica(String texto) {
+        try {
+            String criterio = normalizarTexto(texto);
+
+            List<Cliente> todos = controladorLogico.obtenerTodosClientes();
+
+            List<Cliente> resultados = todos.stream()
+                    .filter(c ->
+                            normalizarTexto(c.getNombre()).contains(criterio)
+                                    || normalizarTexto(c.getEmail()).contains(criterio)
+                                    || normalizarTexto(c.getNif()).contains(criterio)
+                                    || normalizarTexto(c.getDomicilio()).contains(criterio)
+                                    || normalizarTexto(obtenerTipoCliente(c)).contains(criterio)
+                                    || String.valueOf(c.getIdCliente()).contains(criterio)
+                    )
+                    .collect(Collectors.toList());
+
+            tvTabla.setItems(FXCollections.observableArrayList(resultados));
+
+            if (resultados.isEmpty()) {
+                mostrarMensaje("No se encontraron clientes para: " + texto);
+            } else {
+                mostrarMensaje("Clientes encontrados: " + resultados.size());
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al buscar clientes: " + e.getMessage());
+            mostrarMensaje("ERROR: No se pudo realizar la búsqueda de clientes.");
+        }
+    }
+
+    /**
+     * Devuelve el tipo textual del cliente para mostrarlo en la tabla y poder buscarlo.
+     *
+     * @param cliente cliente evaluado
+     * @return Premium o Estándar
+     */
+    private String obtenerTipoCliente(Cliente cliente) {
+        return (cliente instanceof ClientePremium) ? "Premium" : "Estándar";
+    }
+
+    /**
+     * Normaliza un texto para realizar comparaciones seguras durante la búsqueda.
+     *
+     * @param valor texto original
+     * @return texto normalizado en minúsculas y sin espacios externos
+     */
+    private String normalizarTexto(String valor) {
+        return valor == null ? "" : valor.trim().toLowerCase(Locale.ROOT);
+    }
 
     @Override
     @FXML
