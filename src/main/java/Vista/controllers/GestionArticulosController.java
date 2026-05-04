@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 /**
  * Controlador encargado de la gestión de artículos en la vista.
- * Permite mostrar, filtrar y formatear la tabla de productos.
+ * Permite mostrar, filtrar, buscar y formatear la tabla de productos.
  */
 public class GestionArticulosController extends GenericoController<Articulo> {
 
@@ -116,7 +116,51 @@ public class GestionArticulosController extends GenericoController<Articulo> {
         }
     }
 
-    @Override protected void realizarBusquedaEspecifica(String texto) {}
+    /**
+     * Realiza una búsqueda optimizada de artículos por código o descripción.
+     *
+     * La búsqueda se realiza ignorando mayúsculas y minúsculas para mejorar la experiencia
+     * de usuario en la interfaz JavaFX.
+     *
+     * @param texto texto introducido por el usuario en el buscador
+     */
+    @Override
+    protected void realizarBusquedaEspecifica(String texto) {
+        try {
+            String criterio = normalizarTexto(texto);
+
+            List<Articulo> todos = controladorLogico.obtenerTodosArticulos();
+
+            List<Articulo> resultados = todos.stream()
+                    .filter(a ->
+                            normalizarTexto(a.getCodigo()).contains(criterio)
+                                    || normalizarTexto(a.getDescripcion()).contains(criterio)
+                    )
+                    .collect(Collectors.toList());
+
+            tvTabla.setItems(FXCollections.observableArrayList(resultados));
+
+            if (resultados.isEmpty()) {
+                mostrarMensaje("No se encontraron artículos para: " + texto);
+            } else {
+                mostrarMensaje("Artículos encontrados: " + resultados.size());
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al buscar artículos: " + e.getMessage());
+            mostrarMensaje("ERROR: No se pudo realizar la búsqueda de artículos.");
+        }
+    }
+
+    /**
+     * Normaliza un texto para realizar comparaciones seguras durante la búsqueda.
+     *
+     * @param valor texto original
+     * @return texto normalizado en minúsculas y sin espacios externos
+     */
+    private String normalizarTexto(String valor) {
+        return valor == null ? "" : valor.trim().toLowerCase();
+    }
 
     @Override
     @FXML protected void eliminarElemento() {}

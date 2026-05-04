@@ -2,6 +2,7 @@ package Vista.controllers;
 
 import Modelo.Pedido;
 import Controlador.Controlador;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,18 +12,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
  * Controlador encargado de la gestión de pedidos.
- * Permite visualizar, filtrar, actualizar estado y gestionar pedidos desde la interfaz.
+ * Permite visualizar, filtrar, buscar, actualizar estado y gestionar pedidos desde la interfaz JavaFX.
  */
 public class GestionPedidosController extends GenericoController<Pedido> {
 
@@ -45,19 +46,36 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         colId.setCellValueFactory(new PropertyValueFactory<>("numeroPedido"));
 
         colCliente.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getCliente().getNombre()));
+                new SimpleStringProperty(
+                        cellData.getValue().getCliente() == null
+                                ? ""
+                                : cellData.getValue().getCliente().getNombre()
+                )
+        );
 
         colArticulo.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getArticulo().getDescripcion()));
+                new SimpleStringProperty(
+                        cellData.getValue().getArticulo() == null
+                                ? ""
+                                : cellData.getValue().getArticulo().getDescripcion()
+                )
+        );
 
         colCant.setCellValueFactory(cellData ->
-                new SimpleStringProperty(String.valueOf(cellData.getValue().getCantidad())));
+                new SimpleStringProperty(String.valueOf(cellData.getValue().getCantidad()))
+        );
 
         colFecha.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getFechaHora().toString()));
+                new SimpleStringProperty(
+                        cellData.getValue().getFechaHora() == null
+                                ? ""
+                                : cellData.getValue().getFechaHora().toString()
+                )
+        );
 
         colTotal.setCellValueFactory(cellData ->
-                new SimpleStringProperty(String.format("%.2f €", cellData.getValue().calcularTotal())));
+                new SimpleStringProperty(String.format("%.2f €", cellData.getValue().calcularTotal()))
+        );
 
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
 
@@ -83,10 +101,12 @@ public class GestionPedidosController extends GenericoController<Pedido> {
                 listaFiltrada = todos.stream()
                         .filter(p -> "PENDIENTE".equalsIgnoreCase(p.getEstado()))
                         .collect(Collectors.toList());
+
             } else if ("Enviados".equals(seleccion)) {
                 listaFiltrada = todos.stream()
                         .filter(p -> "ENVIADO".equalsIgnoreCase(p.getEstado()))
                         .collect(Collectors.toList());
+
             } else {
                 listaFiltrada = todos;
             }
@@ -100,16 +120,70 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             }
 
         } catch (Exception e) {
-            System.err.println("Error al filtrar: " + e.getMessage());
+            System.err.println("Error al filtrar pedidos: " + e.getMessage());
             mostrarMensaje("ERROR: No se pudo conectar con la base de datos.");
         }
     }
 
-    @Override protected void realizarBusquedaEspecifica(String texto) {}
+    /**
+     * Realiza una búsqueda de pedidos únicamente por ID del pedido o por nombre del cliente.
+     *
+     * La búsqueda ignora mayúsculas y minúsculas en el nombre del cliente.
+     *
+     * @param texto texto introducido por el usuario en el buscador
+     */
+    @Override
+    protected void realizarBusquedaEspecifica(String texto) {
+        try {
+            String criterio = normalizarTexto(texto);
 
-    @Override @FXML protected void eliminarElemento() {}
+            List<Pedido> todos = controladorLogico.getListaPedidos();
 
-    @Override @FXML protected void mostrarFormulario() {
+            List<Pedido> resultados = todos.stream()
+                    .filter(p ->
+                            String.valueOf(p.getNumeroPedido()).contains(criterio)
+                                    || normalizarTexto(
+                                    p.getCliente() == null
+                                            ? ""
+                                            : p.getCliente().getNombre()
+                            ).contains(criterio)
+                    )
+                    .collect(Collectors.toList());
+
+            tvTabla.setItems(FXCollections.observableArrayList(resultados));
+
+            if (resultados.isEmpty()) {
+                mostrarMensaje("No se encontraron pedidos para: " + texto);
+            } else {
+                mostrarMensaje("Pedidos encontrados: " + resultados.size());
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al buscar pedidos: " + e.getMessage());
+            mostrarMensaje("ERROR: No se pudo realizar la búsqueda de pedidos.");
+        }
+    }
+
+    /**
+     * Normaliza un texto para realizar comparaciones seguras durante la búsqueda.
+     *
+     * @param valor texto original
+     * @return texto normalizado en minúsculas y sin espacios externos
+     */
+    private String normalizarTexto(String valor) {
+        return valor == null ? "" : valor.trim().toLowerCase(Locale.ROOT);
+    }
+
+    @Override
+    @FXML
+    protected void eliminarElemento() {}
+
+    /**
+     * Abre el formulario para añadir un nuevo pedido.
+     */
+    @Override
+    @FXML
+    protected void mostrarFormulario() {
         abrirFormulario("/Vista/fxml/formularios/FormularioPedido.fxml", "Nuevo Pedido");
     }
 
@@ -119,6 +193,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
     @FXML
     public void cambiarAEnviado() {
         Pedido seleccionado = tvTabla.getSelectionModel().getSelectedItem();
+
         if (seleccionado == null) {
             mostrarMensaje("Por favor, selecciona un pedido de la tabla.");
             return;
@@ -133,6 +208,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
                 controladorLogico.marcarPedidoComoEnviado(seleccionado.getNumeroPedido());
                 mostrarMensaje("Pedido enviado correctamente.");
                 filtrar();
+
             } catch (Exception e) {
                 mostrarMensaje("ERROR: " + e.getMessage());
             }
@@ -152,6 +228,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/Vista/fxml/ConfirmacionDialog.fxml")
             );
+
             Parent root = loader.load();
 
             Stage stage = new Stage();
@@ -175,8 +252,15 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             Button btnOk = (Button) root.lookup("#btnAceptar");
             Button btnCan = (Button) root.lookup("#btnCancelar");
 
-            btnOk.setOnAction(e -> { resultado[0] = true; stage.close(); });
-            btnCan.setOnAction(e -> { resultado[0] = false; stage.close(); });
+            btnOk.setOnAction(e -> {
+                resultado[0] = true;
+                stage.close();
+            });
+
+            btnCan.setOnAction(e -> {
+                resultado[0] = false;
+                stage.close();
+            });
 
             stage.setOnShowing(ev -> {
                 stage.setX(primaryStage.getX() + (primaryStage.getWidth() / 2) - 200);
