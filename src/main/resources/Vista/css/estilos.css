@@ -1,533 +1,541 @@
-/* ============================================================
-   BUGBUSTERS · PRODUCTO 5
-   ESTILOS UI · VERSIÓN PREMIUM FUTURISTA
-   ------------------------------------------------------------
-   Objetivo:
-   - Mejorar drásticamente el diseño visual general.
-   - Mantener compatibilidad con JavaFX.
-   - No modificar lógica Java.
-   - No modificar FXML.
-   - No romper el trabajo del equipo.
-   ============================================================ */
+/* ================================================================
+   NEXUS UI · FUTURISTIC THEME
+   Sistema de diseño cyber-elegante para JavaFX
+   Paleta: Deep Space + Electric Cyan
+   ================================================================ */
 
 
-/* ============================================================
-   1. BASE GENERAL
-   ============================================================ */
+/* ================================================================
+   0. TOKENS DE DISEÑO  (referencia de paleta)
+   ----------------------------------------------------------------
+   #0a0e17  · obsidian        (fondo más profundo)
+   #11161f  · void            (fondo principal)
+   #161c28  · graphite        (superficies)
+   #1f2738  · slate            (paneles)
+   #2a3447  · steel            (bordes y hover)
+   #3d4a63  · mist             (separadores)
 
+   #66c0f4  · azure            (primario)
+   #00d4ff  · electric cyan    (acento)
+   #4dffd2  · plasma           (highlight)
+   #c1d1db  · pearl            (texto suave)
+   #ffffff  · pure             (texto principal)
+
+   #ff5577  · alert            (destructivo)
+   ================================================================ */
+
+
+/* ================================================================
+   1. RAÍZ Y ESTRUCTURA PRINCIPAL
+   ================================================================ */
 .root {
-    -fx-font-family: "Segoe UI", "Arial", sans-serif;
-    -fx-background-color: #050d18;
-    -fx-text-fill: #eef7ff;
-    -fx-focus-color: #7de3ff;
+    -fx-background-color: #0a0e17;
+    -fx-font-family: "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
+    -fx-font-smoothing-type: gray;
+    -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
 }
 
 .root-pane {
-    -fx-background-color:
-            linear-gradient(to bottom right, #030812 0%, #07111e 35%, #0b1524 70%, #101a29 100%);
-}
-
-.vbox-main {
-    -fx-background-color:
-            linear-gradient(to bottom right, #040a14 0%, #07111e 40%, #0c1523 100%);
-    -fx-padding: 22;
-    -fx-spacing: 18;
+    -fx-background-color: linear-gradient(
+        from 0% 0% to 100% 100%,
+        #0a0e17 0%,
+        #11161f 50%,
+        #0a0e17 100%
+    );
 }
 
 .area-contenido {
     -fx-background-color:
-            linear-gradient(to bottom right, #0b1625 0%, #0f1c2f 48%, #132238 100%);
-    -fx-background-radius: 24;
-    -fx-border-color: #214261;
-    -fx-border-width: 1.2;
-    -fx-border-radius: 24;
-    -fx-padding: 22;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.50), 28, 0.25, 0, 10);
+        linear-gradient(to bottom right, #161c28, #11161f);
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: rgba(102, 192, 244, 0.08);
+    -fx-border-width: 1;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 30, 0.15, 0, 8);
 }
 
 
-/* ============================================================
-   2. SIDEBAR / ZONA LATERAL
-   ============================================================ */
-
+/* ================================================================
+   2. BARRA LATERAL (SIDEBAR)
+   ================================================================ */
 .sidebar {
-    -fx-background-color:
-            linear-gradient(to bottom, #06101c 0%, #091626 45%, #07111f 100%);
-    -fx-background-radius: 0 26 26 0;
-    -fx-border-color: transparent #1d3b57 transparent transparent;
-    -fx-border-width: 0 1.2 0 0;
-    -fx-border-radius: 0 26 26 0;
-    -fx-padding: 20 18 20 18;
-    -fx-spacing: 14;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.60), 30, 0.30, 10, 0);
+    -fx-background-color: linear-gradient(
+        to bottom,
+        #11161f 0%,
+        #0a0e17 100%
+    );
+    -fx-background-radius: 0 18 18 0;
+    -fx-border-color: transparent rgba(102, 192, 244, 0.1) transparent transparent;
+    -fx-border-width: 0 1 0 0;
+    -fx-padding: 24 16 24 16;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 20, 0, 4, 0);
 }
 
 .logo-text {
-    -fx-text-fill: #95ecff;
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.40), 16, 0.25, 0, 0);
+    -fx-text-fill: linear-gradient(to right, #66c0f4, #00d4ff);
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-letter-spacing: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 0.45), 14, 0.4, 0, 0);
 }
 
 .sub-logo-text {
-    -fx-text-fill: #8ba9bf;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
+    -fx-text-fill: #4dffd2;
+    -fx-font-size: 9px;
+    -fx-font-weight: 600;
+    -fx-letter-spacing: 4px;
+    -fx-opacity: 0.75;
 }
 
 
-/* ============================================================
-   3. CABECERAS Y TÍTULOS
-   ============================================================ */
+/* ================================================================
+   3. BOTONES
+   ================================================================ */
 
-.header-bar {
-    -fx-background-color:
-            linear-gradient(to bottom right, #12243a 0%, #0e1d31 50%, #0b1728 100%);
-    -fx-background-radius: 22;
-    -fx-border-color: #224663;
-    -fx-border-width: 1;
-    -fx-border-radius: 22;
-    -fx-padding: 18 22 18 22;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.38), 20, 0.22, 0, 6);
-}
-
-.titulo-inicio {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 38px;
-    -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.28), 14, 0.20, 0, 0);
-}
-
-.subtitulo-inicio {
-    -fx-text-fill: #9fbfd4;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-}
-
-.label-titulo {
-    -fx-text-fill: #8feaff;
-    -fx-font-size: 21px;
-    -fx-font-weight: bold;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.22), 10, 0.18, 0, 0);
-}
-
-.label-cuerpo {
-    -fx-text-fill: #d9e7f2;
-    -fx-font-size: 14px;
-}
-
-.mensaje-confirmacion {
-    -fx-text-fill: #9cefff;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-}
-
-
-/* ============================================================
-   4. BOTONES GENERALES
-   ============================================================ */
-
-.button {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-    -fx-padding: 10 18 10 18;
-    -fx-min-height: 40;
-}
-
-.button:pressed {
-    -fx-scale-x: 0.985;
-    -fx-scale-y: 0.985;
-}
-
-
-/* ============================================================
-   5. BOTONES DEL MENÚ LATERAL
-   ============================================================ */
-
+/* --- Botones laterales (navegación) ----------------------------- */
 .boton-lateral {
     -fx-background-color: transparent;
-    -fx-text-fill: #d7e4f0;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 16;
-    -fx-border-radius: 16;
+    -fx-text-fill: #c1d1db;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-letter-spacing: 0.5px;
+    -fx-padding: 12 18 12 18;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
     -fx-border-color: transparent;
-    -fx-border-width: 1;
-    -fx-alignment: center-left;
-    -fx-padding: 0 0 0 22;
-    -fx-min-height: 46;
+    -fx-border-width: 0 0 0 2;
+    -fx-border-radius: 10;
 }
 
 .boton-lateral:hover {
-    -fx-background-color:
-            linear-gradient(to right, rgba(30, 64, 97, 0.95), rgba(18, 41, 64, 0.95));
+    -fx-background-color: linear-gradient(
+        to right,
+        rgba(102, 192, 244, 0.12),
+        rgba(102, 192, 244, 0.02)
+    );
     -fx-text-fill: #ffffff;
-    -fx-border-color: #39729d;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.18), 14, 0.20, 0, 0);
+    -fx-border-color: #00d4ff transparent transparent transparent;
+    -fx-border-width: 0 0 0 2;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 0.18), 10, 0, 0, 0);
 }
 
-.boton-lateral:focused {
-    -fx-background-color:
-            linear-gradient(to right, rgba(33, 79, 116, 0.95), rgba(18, 41, 64, 0.95));
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #7de3ff;
+.boton-lateral:pressed {
+    -fx-background-color: rgba(102, 192, 244, 0.18);
 }
 
-
-/* ============================================================
-   6. BOTONES FUNCIONALES
-   ============================================================ */
-
-/* Botones normales / acciones estándar / lupa / aceptar */
-.boton-primario,
-.boton-salir {
-    -fx-background-color:
-            linear-gradient(to bottom right, #214f73 0%, #173852 100%);
-    -fx-text-fill: #f5fcff;
-    -fx-border-color: #39729d;
+/* --- Botón primario / salir ------------------------------------- */
+.boton-primario, .boton-salir {
+    -fx-background-color: linear-gradient(
+        to bottom,
+        #2a3447 0%,
+        #1f2738 100%
+    );
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-letter-spacing: 1px;
+    -fx-padding: 10 22 10 22;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: rgba(102, 192, 244, 0.25);
     -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.32), 12, 0.18, 0, 4);
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 8, 0.1, 0, 2);
 }
 
-.boton-primario:hover,
-.boton-salir:hover {
-    -fx-background-color:
-            linear-gradient(to bottom right, #2b6a98 0%, #1c496a 100%);
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #7de3ff;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.30), 18, 0.24, 0, 0);
+.boton-primario:hover, .boton-salir:hover {
+    -fx-background-color: linear-gradient(
+        to bottom,
+        #3d4a63 0%,
+        #2a3447 100%
+    );
+    -fx-border-color: #66c0f4;
+    -fx-effect: dropshadow(gaussian, rgba(102, 192, 244, 0.35), 14, 0.2, 0, 0);
 }
 
+.boton-primario:pressed, .boton-salir:pressed {
+    -fx-background-color: #1f2738;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.5), 6, 0, 0, 2);
+}
 
-/* Botón crear / acción destacada */
+/* --- Botón resaltado (CTA principal) ---------------------------- */
 .boton-resaltado {
-    -fx-background-color:
-            linear-gradient(to bottom right, #8ff0ff 0%, #5ec9ef 45%, #3fa5d0 100%);
-    -fx-text-fill: #04111b;
-    -fx-border-color: #d6fbff;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.42), 18, 0.24, 0, 0);
+    -fx-background-color: linear-gradient(
+        to bottom right,
+        #66c0f4 0%,
+        #00d4ff 100%
+    );
+    -fx-text-fill: #0a0e17;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-letter-spacing: 1.2px;
+    -fx-padding: 11 26 11 26;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 0.45), 16, 0.3, 0, 0);
 }
 
 .boton-resaltado:hover {
-    -fx-background-color:
-            linear-gradient(to bottom right, #ffffff 0%, #baf7ff 50%, #72dfff 100%);
-    -fx-text-fill: #04111b;
-    -fx-border-color: #ffffff;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.52), 22, 0.28, 0, 0);
+    -fx-background-color: linear-gradient(
+        to bottom right,
+        #4dffd2 0%,
+        #66c0f4 100%
+    );
+    -fx-text-fill: #0a0e17;
+    -fx-effect: dropshadow(gaussian, rgba(77, 255, 210, 0.7), 22, 0.4, 0, 0);
 }
 
+.boton-resaltado:pressed {
+    -fx-background-color: #66c0f4;
+    -fx-effect: innershadow(gaussian, rgba(10, 14, 23, 0.3), 8, 0, 0, 2);
+}
 
-/* Botón eliminar / cancelar */
+/* --- Botón eliminar / destructivo ------------------------------- */
 .boton-eliminar {
-    -fx-background-color:
-            linear-gradient(to bottom right, #341a24 0%, #24131a 100%);
-    -fx-text-fill: #ffc1ce;
-    -fx-border-color: #a84f65;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.32), 12, 0.18, 0, 4);
-}
-
-.boton-eliminar:hover {
-    -fx-background-color:
-            linear-gradient(to bottom right, #8f3550 0%, #592233 100%);
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #ff8ea7;
-    -fx-effect: dropshadow(gaussian, rgba(255, 142, 167, 0.30), 18, 0.24, 0, 0);
-}
-
-
-/* ============================================================
-   7. CAMPOS DE TEXTO Y BUSCADORES
-   ============================================================ */
-
-.text-field,
-.text-field-steam {
-    -fx-background-color:
-            linear-gradient(to bottom, #081423 0%, #0a1626 100%);
-    -fx-text-fill: #f2fbff;
-    -fx-prompt-text-fill: #6f90a7;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-    -fx-border-color: #294a67;
-    -fx-border-width: 1;
-    -fx-padding: 10 14 10 14;
-    -fx-min-height: 40;
-    -fx-highlight-fill: #8feaff;
-    -fx-highlight-text-fill: #06101a;
-}
-
-.text-field:hover,
-.text-field-steam:hover {
-    -fx-border-color: #417198;
-}
-
-.text-field:focused,
-.text-field-steam:focused {
-    -fx-border-color: #8feaff;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.30), 14, 0.22, 0, 0);
-}
-
-
-/* ============================================================
-   8. COMBOBOX / FILTROS
-   ============================================================ */
-
-.combo-box-base,
-.combo-box-steam {
-    -fx-background-color:
-            linear-gradient(to bottom, #081423 0%, #0a1626 100%);
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-    -fx-border-color: #294a67;
-    -fx-border-width: 1;
-    -fx-padding: 3 8 3 8;
-    -fx-min-height: 40;
-}
-
-.combo-box-base:hover,
-.combo-box-steam:hover {
-    -fx-border-color: #417198;
-}
-
-.combo-box-base:focused,
-.combo-box-steam:focused {
-    -fx-border-color: #8feaff;
-    -fx-effect: dropshadow(gaussian, rgba(125, 227, 255, 0.28), 14, 0.22, 0, 0);
-}
-
-.combo-box-base .label,
-.combo-box-steam .label {
-    -fx-text-fill: #f2fbff;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-}
-
-.combo-box-base .arrow,
-.combo-box-steam .arrow {
-    -fx-background-color: #8feaff;
-}
-
-.combo-box-base .arrow-button,
-.combo-box-steam .arrow-button {
     -fx-background-color: transparent;
-}
-
-.combo-box-popup .list-view {
-    -fx-background-color: #081423;
-    -fx-border-color: #8feaff;
-    -fx-border-width: 1;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-    -fx-padding: 6;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 18, 0.24, 0, 6);
-}
-
-.combo-box-popup .list-cell {
-    -fx-background-color: transparent;
-    -fx-text-fill: #dce9f3;
-    -fx-padding: 9 12 9 12;
-    -fx-background-radius: 10;
-    -fx-font-size: 13px;
-}
-
-.combo-box-popup .list-cell:hover {
-    -fx-background-color: #173652;
-    -fx-text-fill: #ffffff;
-}
-
-.combo-box-popup .list-cell:selected {
-    -fx-background-color: #2a6a96;
-    -fx-text-fill: #ffffff;
-}
-
-
-/* ============================================================
-   9. CONTENEDOR DE TABLAS
-   ============================================================ */
-
-.table-container {
-    -fx-background-color:
-            linear-gradient(to bottom right, #102033 0%, #0c1828 48%, #091321 100%);
-    -fx-background-radius: 22;
-    -fx-border-color: #214261;
-    -fx-border-width: 1;
-    -fx-border-radius: 22;
-    -fx-padding: 16;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.42), 22, 0.24, 0, 8);
-}
-
-
-/* ============================================================
-   10. TABLAS
-   ============================================================ */
-
-.table-view {
-    -fx-background-color: #07111d;
-    -fx-background-radius: 18;
-    -fx-border-radius: 18;
-    -fx-border-color: #264764;
-    -fx-border-width: 1;
-    -fx-background-insets: 0;
-    -fx-padding: 0;
-    -fx-table-cell-border-color: transparent;
-}
-
-.table-view:focused {
-    -fx-border-color: #4e8ab4;
-}
-
-.table-view .column-header-background {
-    -fx-background-color:
-            linear-gradient(to bottom, #1c3a57 0%, #132a41 100%);
-    -fx-background-radius: 18 18 0 0;
-}
-
-.table-view .column-header-background .filler {
-    -fx-background-color: #132a41;
-    -fx-background-radius: 0 18 0 0;
-}
-
-.table-view .column-header {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent #264764 transparent transparent;
-    -fx-border-width: 0 1 0 0;
-    -fx-padding: 10 8 10 8;
-    -fx-size: 44;
-}
-
-.table-view .column-header .label {
-    -fx-text-fill: #f5fbff;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-}
-
-.table-view .placeholder .label {
-    -fx-text-fill: #8ca9bc;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
-
-.table-row-cell {
-    -fx-background-color: #0b1726;
-    -fx-border-color: transparent;
-    -fx-table-cell-border-color: transparent;
-}
-
-.table-row-cell:odd {
-    -fx-background-color: #091321;
-}
-
-.table-row-cell:hover {
-    -fx-background-color: #17324b;
-}
-
-.table-row-cell:selected {
-    -fx-background-color:
-            linear-gradient(to right, #8feaff 0%, #59caef 100%);
-}
-
-.table-row-cell:selected .table-cell {
-    -fx-text-fill: #04111b;
-    -fx-font-weight: bold;
-}
-
-.table-cell {
-    -fx-text-fill: #dce9f3;
-    -fx-font-size: 13px;
-    -fx-padding: 11 9 11 9;
-    -fx-border-color: transparent;
-}
-
-.table-view .corner {
-    -fx-background-color: #07111d;
-}
-
-
-/* ============================================================
-   11. SCROLL BARS
-   ============================================================ */
-
-.scroll-bar:vertical,
-.scroll-bar:horizontal {
-    -fx-background-color: #07111d;
-}
-
-.scroll-bar:vertical .track,
-.scroll-bar:horizontal .track {
-    -fx-background-color: #07111d;
-    -fx-border-color: transparent;
-}
-
-.scroll-bar:vertical .thumb,
-.scroll-bar:horizontal .thumb {
-    -fx-background-color: #2a4f6f;
-    -fx-background-radius: 10;
-}
-
-.scroll-bar:vertical .thumb:hover,
-.scroll-bar:horizontal .thumb:hover {
-    -fx-background-color: #42779e;
-}
-
-.scroll-bar .increment-button,
-.scroll-bar .decrement-button {
-    -fx-background-color: transparent;
-    -fx-padding: 4;
-}
-
-.scroll-bar .increment-arrow,
-.scroll-bar .decrement-arrow {
-    -fx-background-color: #87a8bf;
-}
-
-
-/* ============================================================
-   12. DIÁLOGOS / CONFIRMACIÓN
-   ============================================================ */
-
-#lblMensaje {
-    -fx-text-fill: #dce9f3;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
-
-#btnAceptar {
-    -fx-min-width: 120;
-}
-
-#btnCancelar {
-    -fx-min-width: 120;
-}
-
-
-/* ============================================================
-   13. TOOLTIP
-   ============================================================ */
-
-.tooltip {
-    -fx-background-color: #081423;
-    -fx-text-fill: #f2fbff;
-    -fx-border-color: #8feaff;
+    -fx-text-fill: #66c0f4;
+    -fx-border-color: rgba(102, 192, 244, 0.5);
     -fx-border-width: 1;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
     -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-letter-spacing: 0.8px;
+    -fx-padding: 9 20 9 20;
+    -fx-cursor: hand;
+}
+
+.boton-eliminar:hover {
+    -fx-background-color: rgba(255, 85, 119, 0.08);
+    -fx-text-fill: #ff5577;
+    -fx-border-color: #ff5577;
+    -fx-effect: dropshadow(gaussian, rgba(255, 85, 119, 0.35), 12, 0.2, 0, 0);
+}
+
+.boton-eliminar:pressed {
+    -fx-background-color: rgba(255, 85, 119, 0.15);
 }
 
 
-/* ============================================================
-   14. ESTADOS DESHABILITADOS
-   ============================================================ */
+/* ================================================================
+   4. COMBO BOX (DESPLEGABLE)
+   ================================================================ */
+.combo-box-steam {
+    -fx-background-color: linear-gradient(to bottom, #1f2738, #161c28);
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: rgba(102, 192, 244, 0.2);
+    -fx-border-width: 1;
+    -fx-padding: 4 8 4 8;
+    -fx-cursor: hand;
+}
 
-.button:disabled,
-.text-field:disabled,
-.combo-box-base:disabled,
-.combo-box-steam:disabled,
-.table-view:disabled {
-    -fx-opacity: 0.55;
+.combo-box-steam:hover {
+    -fx-border-color: #66c0f4;
+    -fx-effect: dropshadow(gaussian, rgba(102, 192, 244, 0.25), 10, 0.15, 0, 0);
+}
+
+.combo-box-steam:focused {
+    -fx-border-color: #00d4ff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 0.4), 12, 0.25, 0, 0);
+}
+
+.combo-box-steam .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-padding: 2 4 2 4;
+}
+
+.combo-box-steam .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 6 0 6;
+}
+
+.combo-box-steam .arrow {
+    -fx-background-color: #66c0f4;
+}
+
+.combo-box-steam:hover .arrow {
+    -fx-background-color: #00d4ff;
+}
+
+.combo-box-steam .list-view {
+    -fx-background-color: #11161f;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: rgba(102, 192, 244, 0.3);
+    -fx-border-width: 1;
+    -fx-padding: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 16, 0.2, 0, 6);
+}
+
+.combo-box-steam .list-cell {
+    -fx-text-fill: #c1d1db;
+    -fx-background-color: transparent;
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+}
+
+.combo-box-steam .list-cell:hover,
+.combo-box-steam .list-cell:filled:selected:hover {
+    -fx-background-color: linear-gradient(
+        to right,
+        rgba(102, 192, 244, 0.18),
+        rgba(0, 212, 255, 0.05)
+    );
+    -fx-text-fill: #00d4ff;
+}
+
+.combo-box-steam .list-cell:filled:selected {
+    -fx-background-color: rgba(102, 192, 244, 0.12);
+    -fx-text-fill: #66c0f4;
+}
+
+
+/* ================================================================
+   5. CAMPO DE TEXTO / BUSCADOR
+   ================================================================ */
+.text-field-steam {
+    -fx-background-color: #11161f;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: rgba(193, 209, 219, 0.4);
+    -fx-border-color: rgba(102, 192, 244, 0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 9 14 9 14;
+    -fx-highlight-fill: rgba(0, 212, 255, 0.35);
+    -fx-highlight-text-fill: #ffffff;
+}
+
+.text-field-steam:hover {
+    -fx-border-color: rgba(102, 192, 244, 0.5);
+}
+
+.text-field-steam:focused {
+    -fx-border-color: #00d4ff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 0.35), 12, 0.25, 0, 0);
+}
+
+
+/* ================================================================
+   6. TÍTULOS Y TIPOGRAFÍA
+   ================================================================ */
+.titulo-inicio {
+    -fx-text-fill: linear-gradient(to right, #ffffff, #66c0f4);
+    -fx-font-size: 36px;
+    -fx-font-weight: 800;
+    -fx-letter-spacing: -0.5px;
+    -fx-effect: dropshadow(gaussian, rgba(102, 192, 244, 0.25), 18, 0.15, 0, 2);
+}
+
+.label-titulo {
+    -fx-text-fill: #66c0f4 !important;
+    -fx-font-weight: 700;
+    -fx-font-size: 18px;
+    -fx-letter-spacing: 0.8px;
+}
+
+.subtitulo-inicio {
+    -fx-text-fill: #4dffd2;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-letter-spacing: 3px;
+    -fx-opacity: 0.85;
+}
+
+.mensaje-confirmacion {
+    -fx-text-fill: #4dffd2;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-padding: 8 12 8 12;
+    -fx-background-color: rgba(77, 255, 210, 0.08);
+    -fx-background-radius: 6;
+    -fx-border-color: rgba(77, 255, 210, 0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+}
+
+
+/* ================================================================
+   7. TABLA (TABLE-VIEW)
+   ================================================================ */
+.table-view {
+    -fx-background-color: #11161f;
+    -fx-border-color: rgba(102, 192, 244, 0.15);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 14, 0.1, 0, 4);
+}
+
+.table-view:focused {
+    -fx-border-color: rgba(102, 192, 244, 0.35);
+}
+
+/* --- Cabecera --------------------------------------------------- */
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(
+        to bottom,
+        #1f2738 0%,
+        #161c28 100%
+    );
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header-background .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header,
+.table-view .column-header .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent rgba(102, 192, 244, 0.12) #00d4ff transparent;
+    -fx-border-width: 0 1 2 0;
+    -fx-padding: 14 12 14 12;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #66c0f4;
+    -fx-font-weight: 700;
+    -fx-font-size: 11px;
+    -fx-letter-spacing: 1.5px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* --- Placeholder ------------------------------------------------ */
+.table-view .placeholder .label {
+    -fx-text-fill: rgba(193, 209, 219, 0.5) !important;
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+}
+
+/* --- Filas y celdas -------------------------------------------- */
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent rgba(102, 192, 244, 0.06) transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0;
+    -fx-cell-size: 42px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: rgba(102, 192, 244, 0.025);
+}
+
+.table-row-cell:hover {
+    -fx-background-color: rgba(102, 192, 244, 0.07);
+}
+
+.table-row-cell:selected {
+    -fx-background-color: linear-gradient(
+        to right,
+        rgba(0, 212, 255, 0.18),
+        rgba(102, 192, 244, 0.08)
+    );
+    -fx-border-color: transparent transparent transparent #00d4ff;
+    -fx-border-width: 0 0 0 3;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 600;
+}
+
+.table-cell {
+    -fx-text-fill: #c1d1db;
+    -fx-border-color: transparent;
+    -fx-padding: 10 12 10 12;
+    -fx-font-size: 12.5px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-view .corner {
+    -fx-background-color: #161c28;
+    -fx-background-radius: 0 12 0 0;
+}
+
+
+/* ================================================================
+   8. SCROLLBAR  (estilizada para coherencia)
+   ================================================================ */
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: rgba(102, 192, 244, 0.25);
+    -fx-background-radius: 8;
+    -fx-background-insets: 2;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: rgba(0, 212, 255, 0.55);
+}
+
+.scroll-bar .thumb:pressed {
+    -fx-background-color: #00d4ff;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button,
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+
+/* ================================================================
+   9. VENTANAS EMERGENTES Y CONTENEDORES
+   ================================================================ */
+.vbox-main {
+    -fx-background-color: linear-gradient(
+        to bottom,
+        #11161f 0%,
+        #0a0e17 100%
+    );
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: rgba(102, 192, 244, 0.15);
+    -fx-border-width: 1;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 24, 0.2, 0, 8);
+}
+
+
+/* ================================================================
+   10. UTILIDADES Y SEPARADORES
+   ================================================================ */
+.separator .line {
+    -fx-border-color: rgba(102, 192, 244, 0.15);
+    -fx-border-width: 1 0 0 0;
+}
+
+.tooltip {
+    -fx-background-color: #11161f;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 11px;
+    -fx-font-weight: 500;
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 6;
+    -fx-border-color: rgba(0, 212, 255, 0.4);
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0, 212, 255, 0.25), 12, 0.2, 0, 2);
 }
