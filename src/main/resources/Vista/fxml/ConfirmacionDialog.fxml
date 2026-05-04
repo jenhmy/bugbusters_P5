@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importaciones de JavaFX usadas en este diálogo -->
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- Ventana de confirmación modal -->
+<VBox spacing="20.0"
+      styleClass="vbox-main"
+      stylesheets="/Vista/css/estilos.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      alignment="CENTER"
+      prefWidth="400.0"
+      style="-fx-border-color: #3a3a3a; -fx-border-width: 2;">
+
+    <children>
+
+        <!-- Título del diálogo -->
+        <Label text="CONFIRMACIÓN" styleClass="label-titulo" />
+
+        <!-- Mensaje dinámico de confirmación -->
+        <Label fx:id="lblMensaje"
+               text="¿Deseas realizar esta acción?"
+               styleClass="label-cuerpo"
+               wrapText="true"
+               textAlignment="CENTER" />
+
+        <!-- Botones de acción -->
+        <HBox spacing="15.0" alignment="CENTER">
+            <children>
+                <Button fx:id="btnAceptar"
+                        text="ACEPTAR"
+                        styleClass="boton-primario" />
+
+                <Button fx:id="btnCancelar"
+                        text="CANCELAR"
+                        styleClass="boton-eliminar" />
+            </children>
+        </HBox>
+
+    </children>
+
+    <!-- Padding interno del diálogo -->
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+</VBox>

@@ -1,0 +1,210 @@
+/* =========================================
+   1. FONDO GENERAL Y ESTRUCTURA PRINCIPAL
+   ========================================= */
+.root {
+    -fx-background-color: #1b2838;
+}
+
+.root-pane {
+    -fx-background-color: #1b2838;
+}
+
+.area-contenido {
+    -fx-background-color: linear-gradient(to bottom right, #1b2838, #171a21);
+    -fx-background-radius: 15;
+}
+
+/* =========================================
+   2. BARRA LATERAL (SIDEBAR)
+   ========================================= */
+.sidebar {
+    -fx-background-color: #171a21;
+    -fx-background-radius: 0 15 15 0;
+}
+
+.logo-text {
+    -fx-text-fill: #66c0f4;
+}
+
+.sub-logo-text {
+    -fx-text-fill: #54a5d4;
+    -fx-font-size: 10px;
+}
+
+/* =========================================
+   3. BOTONES (LATERALES Y ACCIÓN)
+   ========================================= */
+.boton-lateral {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c1d1db;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.boton-lateral:hover {
+    -fx-background-color: #2a475e;
+    -fx-text-fill: white;
+}
+
+.boton-primario, .boton-salir {
+    -fx-background-color: #2a475e;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.boton-primario:hover, .boton-salir:hover {
+    -fx-background-color: #3d6484;
+}
+
+.boton-resaltado {
+    -fx-background-color: #66c0f4;
+    -fx-text-fill: #171a21;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.boton-resaltado:hover {
+    -fx-background-color: #ffffff;
+}
+
+.boton-eliminar {
+    -fx-background-color: #121921;
+    -fx-text-fill: #54a5d4;
+    -fx-border-color: #54a5d4;
+    -fx-background-radius: 5;
+    -fx-border-radius: 10;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.boton-eliminar:hover {
+    -fx-background-color: #627488;
+}
+
+/* DESPLEGABLE */
+.combo-box-steam {
+    -fx-background-color: #2a475e;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 2 5 2 5;
+}
+
+.combo-box-steam .label {
+    -fx-text-fill: white;
+}
+
+.combo-box-steam .list-view {
+    -fx-background-color: #171a21;
+    -fx-border-color: #66c0f4;
+}
+
+.combo-box-steam .list-cell {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+.combo-box-steam .list-cell:hover {
+    -fx-background-color: #2a475e;
+    -fx-text-fill: #66c0f4;
+}
+
+/* Buscador */
+.text-field-steam {
+    -fx-background-color: #171a21;
+    -fx-text-fill: white;
+    -fx-border-color: #2a475e;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-prompt-text-fill: #54a5d4;
+}
+
+.text-field-steam:focused {
+    -fx-border-color: #66c0f4;
+}
+
+/* =========================================
+   4. TÍTULOS Y TEXTOS
+   ========================================= */
+.titulo-inicio {
+    -fx-text-fill: white;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+
+.label-titulo {
+    -fx-text-fill: #66c0f4 !important;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+
+.mensaje-confirmacion {
+    -fx-text-fill: #66c0f4;
+    -fx-font-size: 13px;
+}
+
+.subtitulo-inicio {
+    -fx-text-fill: #54a5d4;
+}
+
+/* =========================================
+   5. TABLAS
+   ========================================= */
+.table-view {
+    -fx-background-color: #171a21;
+    -fx-border-color: #2a475e;
+    -fx-background-insets: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2a475e;
+}
+
+.table-view .column-header-background .filler {
+    -fx-background-color: #2a475e;
+}
+
+.table-view .column-header {
+    -fx-background-color: #2a475e;
+    -fx-border-color: transparent #171a21 transparent transparent;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: #54a5d4 !important;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-cell {
+    -fx-text-fill: #c1d1db;
+    -fx-border-color: transparent;
+}
+
+.table-row-cell {
+    -fx-background-color: #1b2838;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #171a21;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #66c0f4;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: #171a21;
+}
+
+.table-view .corner {
+    -fx-background-color: #171a21;
+}
+
+/* Clase extra para el fondo de la ventana emergente */
+.vbox-main {
+    -fx-background-color: #1b2838;
+}

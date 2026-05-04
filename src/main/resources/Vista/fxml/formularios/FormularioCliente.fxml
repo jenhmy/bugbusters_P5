@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+
+
+<VBox prefWidth="480.0"
+      spacing="20.0"
+      styleClass="vbox-main"
+      stylesheets="/Vista/css/estilos.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="Vista.controllers.formularios.FormularioClienteController">
+</VBox>
+

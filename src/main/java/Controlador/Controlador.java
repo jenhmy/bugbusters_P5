@@ -144,6 +144,10 @@ public class Controlador {
         return pedidoDAO.obtenerPedidosEnviados(idFiltro);
     }
 
+    public List<Pedido> getListaPedidos() throws DAOException {
+        return pedidoDAO.obtenerTodos();
+    }
+
     public void marcarPedidoComoEnviado(int idPedido)
             throws DAOException, RecursoNoEncontradoException, CambioEstadoPedidoNoPermitidoException {
 
