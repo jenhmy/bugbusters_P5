@@ -1,21 +1,35 @@
 package Vista.controllers;
 
-import Modelo.Articulo;
 import Controlador.Controlador;
+import Modelo.Articulo;
+import Modelo.Excepciones.RecursoNoEncontradoException;
+import Vista.fx.SoundFX;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import javafx.geometry.Insets;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Controlador encargado de la gestión de artículos en la vista.
- * Permite mostrar, filtrar, buscar y formatear la tabla de productos.
+ *
+ * Permite mostrar, filtrar, buscar, abrir el formulario de creación y añadir
+ * stock a artículos existentes, manteniendo la lógica de negocio delegada en
+ * el controlador principal del proyecto.
  */
 public class GestionArticulosController extends GenericoController<Articulo> {
 
@@ -26,17 +40,14 @@ public class GestionArticulosController extends GenericoController<Articulo> {
     @FXML private TableColumn<Articulo, Integer> colPrep;
     @FXML private TableColumn<Articulo, Integer> colStock;
 
-    private Controlador controladorLogico = new Controlador();
+    private final Controlador controladorLogico = new Controlador();
 
-    /**
-     * Configura la vista de la tabla de artículos y el formato de sus columnas.
-     */
     @Override
     protected void configurarVista() {
-
         colCodigo.setCellValueFactory(new PropertyValueFactory<>("codigo"));
         colDesc.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
 
+        colPrecio.setCellValueFactory(new PropertyValueFactory<>("precioVenta"));
         colPrecio.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(BigDecimal item, boolean empty) {
@@ -44,8 +55,8 @@ public class GestionArticulosController extends GenericoController<Articulo> {
                 setText((empty || item == null) ? null : String.format("%.2f €", item));
             }
         });
-        colPrecio.setCellValueFactory(new PropertyValueFactory<>("precioVenta"));
 
+        colEnvio.setCellValueFactory(new PropertyValueFactory<>("gastosEnvio"));
         colEnvio.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(BigDecimal item, boolean empty) {
@@ -53,8 +64,8 @@ public class GestionArticulosController extends GenericoController<Articulo> {
                 setText((empty || item == null) ? null : String.format("%.2f €", item));
             }
         });
-        colEnvio.setCellValueFactory(new PropertyValueFactory<>("gastosEnvio"));
 
+        colPrep.setCellValueFactory(new PropertyValueFactory<>("tiempoPreparacionMin"));
         colPrep.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
@@ -62,7 +73,6 @@ public class GestionArticulosController extends GenericoController<Articulo> {
                 setText((empty || item == null) ? null : item + " min");
             }
         });
-        colPrep.setCellValueFactory(new PropertyValueFactory<>("tiempoPreparacionMin"));
 
         colStock.setCellValueFactory(new PropertyValueFactory<>("cantidadDisponible"));
 
@@ -72,9 +82,6 @@ public class GestionArticulosController extends GenericoController<Articulo> {
         tvTabla.setPlaceholder(new Label("Selecciona un filtro para visualizar los artículos."));
     }
 
-    /**
-     * Filtra los artículos según el estado de stock seleccionado.
-     */
     @Override
     protected void filtrar() {
         String seleccion = comboFiltro.getValue();
@@ -102,11 +109,11 @@ public class GestionArticulosController extends GenericoController<Articulo> {
                     break;
             }
 
+            tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
+
             if (listaFiltrada.isEmpty()) {
-                tvTabla.setItems(FXCollections.observableArrayList());
                 mostrarMensaje("No se encontraron artículos: " + seleccion);
             } else {
-                tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
                 mostrarMensaje("Mostrando artículos correctamente.");
             }
 
@@ -116,26 +123,15 @@ public class GestionArticulosController extends GenericoController<Articulo> {
         }
     }
 
-    /**
-     * Realiza una búsqueda optimizada de artículos por código o descripción.
-     *
-     * La búsqueda se realiza ignorando mayúsculas y minúsculas para mejorar la experiencia
-     * de usuario en la interfaz JavaFX.
-     *
-     * @param texto texto introducido por el usuario en el buscador
-     */
     @Override
     protected void realizarBusquedaEspecifica(String texto) {
         try {
             String criterio = normalizarTexto(texto);
-
             List<Articulo> todos = controladorLogico.obtenerTodosArticulos();
 
             List<Articulo> resultados = todos.stream()
-                    .filter(a ->
-                            normalizarTexto(a.getCodigo()).contains(criterio)
-                                    || normalizarTexto(a.getDescripcion()).contains(criterio)
-                    )
+                    .filter(a -> normalizarTexto(a.getCodigo()).contains(criterio)
+                            || normalizarTexto(a.getDescripcion()).contains(criterio))
                     .collect(Collectors.toList());
 
             tvTabla.setItems(FXCollections.observableArrayList(resultados));
@@ -152,24 +148,136 @@ public class GestionArticulosController extends GenericoController<Articulo> {
         }
     }
 
-    /**
-     * Normaliza un texto para realizar comparaciones seguras durante la búsqueda.
-     *
-     * @param valor texto original
-     * @return texto normalizado en minúsculas y sin espacios externos
-     */
     private String normalizarTexto(String valor) {
-        return valor == null ? "" : valor.trim().toLowerCase();
+        return valor == null ? "" : valor.trim().toLowerCase(Locale.ROOT);
     }
 
     @Override
-    @FXML protected void eliminarElemento() {}
+    @FXML
+    protected void eliminarElemento() {
+        // Funcionalidad reservada para la fase correspondiente del equipo.
+    }
 
-    /**
-     * Abre el formulario para añadir un nuevo artículo.
-     */
     @Override
-    @FXML protected void mostrarFormulario() {
+    @FXML
+    protected void mostrarFormulario() {
+        SoundFX.click();
         abrirFormulario("/Vista/fxml/formularios/FormularioArticulos.fxml", "Añadir Nuevo Artículo");
     }
+
+    /**
+     * Abre un diálogo modal para añadir stock a un artículo existente.
+     *
+     * La operación se delega en Controlador.sumarStockArticulo(), evitando que
+     * la vista acceda directamente a DAOs o gestione transacciones JPA.
+     */
+    @FXML
+    protected void anadirStock() {
+        SoundFX.click();
+
+        Articulo seleccionado = tvTabla.getSelectionModel().getSelectedItem();
+        Dialog<StockInput> dialog = crearDialogoStock(seleccionado);
+
+        Optional<StockInput> result = dialog.showAndWait();
+        if (result.isEmpty()) {
+            mostrarMensaje("Operación cancelada.");
+            return;
+        }
+
+        StockInput input = result.get();
+
+        try {
+            controladorLogico.sumarStockArticulo(input.codigo(), input.cantidad());
+            SoundFX.success();
+            mostrarMensaje("Stock añadido correctamente: +" + input.cantidad() + " uds. (" + input.codigo() + ")");
+            filtrar();
+
+        } catch (RecursoNoEncontradoException e) {
+            SoundFX.alert();
+            mostrarMensaje("No existe ningún artículo con código: " + input.codigo());
+
+        } catch (Exception e) {
+            SoundFX.alert();
+            System.err.println("Error al añadir stock: " + e.getMessage());
+            mostrarMensaje("ERROR: No se pudo añadir el stock.");
+        }
+    }
+
+    private Dialog<StockInput> crearDialogoStock(Articulo seleccionado) {
+        Dialog<StockInput> dialog = new Dialog<>();
+        dialog.setTitle("Añadir stock");
+        dialog.setHeaderText("Suma unidades al stock de un artículo existente");
+
+        ButtonType confirmar = new ButtonType("CONFIRMAR", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(confirmar, ButtonType.CANCEL);
+
+        TextField txtCodigo = new TextField();
+        txtCodigo.setPromptText("Código del artículo");
+        if (seleccionado != null) {
+            txtCodigo.setText(seleccionado.getCodigo());
+        }
+
+        TextField txtCantidad = new TextField();
+        txtCantidad.setPromptText("Cantidad a añadir");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setPadding(new Insets(20, 24, 10, 24));
+        grid.add(new Label("Código:"), 0, 0);
+        grid.add(txtCodigo, 1, 0);
+        grid.add(new Label("Cantidad:"), 0, 1);
+        grid.add(txtCantidad, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        try {
+            String css = getClass().getResource("/Vista/css/estilos.css").toExternalForm();
+            dialog.getDialogPane().getStylesheets().add(css);
+        } catch (Exception ignored) {
+            // El diálogo sigue funcionando aunque el CSS no pueda cargarse.
+        }
+
+        Button botonConfirmar = (Button) dialog.getDialogPane().lookupButton(confirmar);
+        botonConfirmar.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            String error = validarEntradaStock(txtCodigo.getText(), txtCantidad.getText());
+            if (error != null) {
+                event.consume();
+                mostrarMensaje(error);
+                SoundFX.alert();
+            }
+        });
+
+        dialog.setResultConverter(button -> {
+            if (button != confirmar) return null;
+            String codigo = txtCodigo.getText().trim();
+            int cantidad = Integer.parseInt(txtCantidad.getText().trim());
+            return new StockInput(codigo, cantidad);
+        });
+
+        return dialog;
+    }
+
+    private String validarEntradaStock(String codigo, String cantidadTexto) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            return "Introduce el código del artículo.";
+        }
+
+        if (cantidadTexto == null || cantidadTexto.trim().isEmpty()) {
+            return "Introduce la cantidad a añadir.";
+        }
+
+        try {
+            int cantidad = Integer.parseInt(cantidadTexto.trim());
+            if (cantidad <= 0) {
+                return "La cantidad debe ser mayor que cero.";
+            }
+        } catch (NumberFormatException e) {
+            return "La cantidad debe ser un número entero válido.";
+        }
+
+        return null;
+    }
+
+    private record StockInput(String codigo, int cantidad) {}
 }

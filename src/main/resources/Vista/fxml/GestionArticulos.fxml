@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Importaciones de JavaFX utilizadas en la vista -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -13,7 +12,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<!-- Vista de gestión de artículos -->
 <VBox prefHeight="600.0"
       prefWidth="1127.0"
       spacing="10.0"
@@ -25,7 +23,6 @@
 
     <children>
 
-        <!-- CABECERA SUPERIOR -->
         <VBox alignment="CENTER_LEFT"
               prefHeight="120.0"
               spacing="10.0"
@@ -33,29 +30,28 @@
 
             <children>
 
-                <!-- Título de la pantalla -->
                 <Label styleClass="label-titulo" text="GESTIÓN DE ARTÍCULOS">
                     <VBox.margin>
                         <Insets left="20.0" />
                     </VBox.margin>
                 </Label>
 
-                <!-- Barra de acciones -->
                 <HBox alignment="CENTER_LEFT" spacing="15.0">
                     <children>
 
-                        <!-- Botón para crear artículo -->
+                        <Button onAction="#volverInicio"
+                                styleClass="boton-primario"
+                                text="⌂ INICIO" />
+
                         <Button onAction="#mostrarFormulario"
                                 styleClass="boton-resaltado"
                                 text="📦 CREAR" />
 
-                        <!-- Filtro de artículos -->
                         <ComboBox fx:id="comboFiltro"
                                   prefWidth="180.0"
                                   promptText="Filtrar por..."
                                   styleClass="combo-box-steam" />
 
-                        <!-- Buscador oculto -->
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
                             <children>
                                 <TextField fx:id="txtBuscador"
@@ -72,7 +68,6 @@
                             </children>
                         </HBox>
 
-                        <!-- Acción eliminar -->
                         <Button onAction="#eliminarElemento"
                                 styleClass="boton-eliminar"
                                 text="ELIMINAR" />
@@ -84,7 +79,6 @@
                     </VBox.margin>
                 </HBox>
 
-                <!-- Mensajes de estado -->
                 <Label fx:id="lblMensaje"
                        styleClass="mensaje-confirmacion">
                     <VBox.margin>
@@ -100,7 +94,6 @@
 
         </VBox>
 
-        <!-- ZONA CENTRAL: TABLA DE ARTÍCULOS -->
         <StackPane VBox.vgrow="ALWAYS">
 
             <children>
@@ -109,7 +102,6 @@
 
                     <children>
 
-                        <!-- Tabla principal -->
                         <TableView fx:id="tvTabla"
                                    AnchorPane.bottomAnchor="15.0"
                                    AnchorPane.leftAnchor="15.0"
@@ -118,7 +110,6 @@
 
                             <columns>
 
-                                <!-- Columnas de artículos -->
                                 <TableColumn fx:id="colCodigo" text="CÓDIGO" prefWidth="80.0" />
                                 <TableColumn fx:id="colDesc" text="DESCRIPCIÓN" prefWidth="200.0" />
                                 <TableColumn fx:id="colPrecio" text="PRECIO" prefWidth="90.0" />

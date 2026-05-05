@@ -5,6 +5,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+import Vista.fx.SoundFX;
+import Vista.services.NavigationService;
 
 /**
  * Controlador genérico base que proporciona funcionalidades comunes
@@ -114,6 +116,14 @@ public abstract class GenericoController<T> {
      */
     @FXML protected abstract void mostrarFormulario();
 
+    /**
+     * Vuelve al dashboard principal.
+     */
+    @FXML
+    protected void volverInicio() {
+        SoundFX.navigate();
+        NavigationService.irADashboard();
+    }
     /**
      * Abre un formulario FXML en una ventana modal.
      *
