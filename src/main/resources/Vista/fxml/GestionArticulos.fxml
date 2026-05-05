@@ -2,19 +2,21 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox prefHeight="600.0"
       prefWidth="1127.0"
-      spacing="10.0"
+      spacing="12.0"
       styleClass="vbox-main"
       stylesheets="/Vista/css/estilos.css"
       xmlns="http://javafx.com/javafx/21"
@@ -24,19 +26,19 @@
     <children>
 
         <VBox alignment="CENTER_LEFT"
-              prefHeight="120.0"
+              prefHeight="122.0"
               spacing="10.0"
               styleClass="header-bar">
 
             <children>
 
-                <Label styleClass="label-titulo" text="GESTIÓN DE ARTÍCULOS">
+                <Label styleClass="label-titulo" text="GESTIÓN DE ARTÍCULOS · PANEL DE INVENTARIO">
                     <VBox.margin>
                         <Insets left="20.0" />
                     </VBox.margin>
                 </Label>
 
-                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
                     <children>
 
                         <Button onAction="#volverInicio"
@@ -47,8 +49,12 @@
                                 styleClass="boton-resaltado"
                                 text="📦 CREAR" />
 
+                        <Button onAction="#anadirStock"
+                                styleClass="boton-primario"
+                                text="＋ AÑADIR STOCK" />
+
                         <ComboBox fx:id="comboFiltro"
-                                  prefWidth="180.0"
+                                  prefWidth="170.0"
                                   promptText="Filtrar por..."
                                   styleClass="combo-box-steam" />
 
@@ -57,7 +63,7 @@
                                 <TextField fx:id="txtBuscador"
                                            managed="false"
                                            prefWidth="200.0"
-                                           promptText="Escribe código..."
+                                           promptText="Código o descripción..."
                                            styleClass="text-field-steam"
                                            visible="false" />
 
@@ -94,6 +100,142 @@
 
         </VBox>
 
+        <GridPane hgap="12.0"
+                  vgap="12.0"
+                  style="-fx-background-color: linear-gradient(to bottom right, rgba(10,20,35,0.84), rgba(12,28,46,0.72)); -fx-background-radius: 18; -fx-border-color: rgba(0,240,255,0.16); -fx-border-width: 1; -fx-border-radius: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.32), 14, 0.18, 0, 5);">
+
+            <VBox.margin>
+                <Insets left="14.0" right="14.0" />
+            </VBox.margin>
+
+            <padding>
+                <Insets top="14.0" right="14.0" bottom="14.0" left="14.0" />
+            </padding>
+
+            <columnConstraints>
+                <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS" />
+                <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS" />
+                <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS" />
+                <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS" />
+                <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS" />
+                <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <children>
+
+                <VBox GridPane.columnIndex="0"
+                      alignment="CENTER_LEFT"
+                      spacing="4.0"
+                      style="-fx-background-color: rgba(255,255,255,0.045); -fx-background-radius: 14; -fx-border-color: rgba(0,240,255,0.18); -fx-border-width: 1; -fx-border-radius: 14;">
+                    <padding>
+                        <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
+                    </padding>
+                    <children>
+                        <Label text="ARTÍCULOS"
+                               style="-fx-text-fill: #67f6ff; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                        <Label fx:id="lblTotalArticulos"
+                               text="—"
+                               style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                        <Label text="registros en catálogo"
+                               style="-fx-text-fill: #9fc1d4; -fx-font-size: 11px;" />
+                    </children>
+                </VBox>
+
+                <VBox GridPane.columnIndex="1"
+                      alignment="CENTER_LEFT"
+                      spacing="4.0"
+                      style="-fx-background-color: rgba(255,255,255,0.045); -fx-background-radius: 14; -fx-border-color: rgba(77,255,210,0.18); -fx-border-width: 1; -fx-border-radius: 14;">
+                    <padding>
+                        <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
+                    </padding>
+                    <children>
+                        <Label text="STOCK TOTAL"
+                               style="-fx-text-fill: #4dffd2; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                        <Label fx:id="lblStockTotal"
+                               text="—"
+                               style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                        <Label text="unidades disponibles"
+                               style="-fx-text-fill: #9fc1d4; -fx-font-size: 11px;" />
+                    </children>
+                </VBox>
+
+                <VBox GridPane.columnIndex="2"
+                      alignment="CENTER_LEFT"
+                      spacing="4.0"
+                      style="-fx-background-color: rgba(255,255,255,0.045); -fx-background-radius: 14; -fx-border-color: rgba(255,92,122,0.22); -fx-border-width: 1; -fx-border-radius: 14;">
+                    <padding>
+                        <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
+                    </padding>
+                    <children>
+                        <Label text="SIN STOCK"
+                               style="-fx-text-fill: #ff5c7a; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                        <Label fx:id="lblSinStock"
+                               text="—"
+                               style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                        <Label text="requieren reposición"
+                               style="-fx-text-fill: #9fc1d4; -fx-font-size: 11px;" />
+                    </children>
+                </VBox>
+
+                <VBox GridPane.columnIndex="3"
+                      alignment="CENTER_LEFT"
+                      spacing="4.0"
+                      style="-fx-background-color: rgba(255,255,255,0.045); -fx-background-radius: 14; -fx-border-color: rgba(255,209,102,0.22); -fx-border-width: 1; -fx-border-radius: 14;">
+                    <padding>
+                        <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
+                    </padding>
+                    <children>
+                        <Label text="STOCK CRÍTICO"
+                               style="-fx-text-fill: #ffd166; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                        <Label fx:id="lblStockCritico"
+                               text="—"
+                               style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                        <Label text="≤ 5 unidades"
+                               style="-fx-text-fill: #9fc1d4; -fx-font-size: 11px;" />
+                    </children>
+                </VBox>
+
+                <VBox GridPane.columnIndex="4"
+                      alignment="CENTER_LEFT"
+                      spacing="4.0"
+                      style="-fx-background-color: rgba(255,255,255,0.045); -fx-background-radius: 14; -fx-border-color: rgba(255,46,136,0.22); -fx-border-width: 1; -fx-border-radius: 14;">
+                    <padding>
+                        <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
+                    </padding>
+                    <children>
+                        <Label text="VALOR INVENTARIO"
+                               style="-fx-text-fill: #ff2e88; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                        <Label fx:id="lblValorInventario"
+                               text="—"
+                               style="-fx-text-fill: white; -fx-font-size: 21px; -fx-font-weight: bold;" />
+                        <Label text="precio venta × stock"
+                               style="-fx-text-fill: #9fc1d4; -fx-font-size: 11px;" />
+                    </children>
+                </VBox>
+
+                <VBox GridPane.columnIndex="5"
+                      alignment="CENTER_LEFT"
+                      spacing="4.0"
+                      style="-fx-background-color: rgba(255,255,255,0.045); -fx-background-radius: 14; -fx-border-color: rgba(157,78,221,0.22); -fx-border-width: 1; -fx-border-radius: 14;">
+                    <padding>
+                        <Insets top="12.0" right="12.0" bottom="12.0" left="12.0" />
+                    </padding>
+                    <children>
+                        <Label text="MAYOR STOCK"
+                               style="-fx-text-fill: #c77dff; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                        <Label fx:id="lblMayorStock"
+                               text="—"
+                               wrapText="true"
+                               style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                        <Label text="producto dominante"
+                               style="-fx-text-fill: #9fc1d4; -fx-font-size: 11px;" />
+                    </children>
+                </VBox>
+
+            </children>
+
+        </GridPane>
+
         <StackPane VBox.vgrow="ALWAYS">
 
             <children>
@@ -110,12 +252,12 @@
 
                             <columns>
 
-                                <TableColumn fx:id="colCodigo" text="CÓDIGO" prefWidth="80.0" />
-                                <TableColumn fx:id="colDesc" text="DESCRIPCIÓN" prefWidth="200.0" />
-                                <TableColumn fx:id="colPrecio" text="PRECIO" prefWidth="90.0" />
-                                <TableColumn fx:id="colEnvio" text="ENVÍO" prefWidth="90.0" />
+                                <TableColumn fx:id="colCodigo" text="CÓDIGO" prefWidth="90.0" />
+                                <TableColumn fx:id="colDesc" text="DESCRIPCIÓN" prefWidth="260.0" />
+                                <TableColumn fx:id="colPrecio" text="PRECIO" prefWidth="100.0" />
+                                <TableColumn fx:id="colEnvio" text="ENVÍO" prefWidth="100.0" />
                                 <TableColumn fx:id="colPrep" text="TIEMPO PREP." prefWidth="150.0" />
-                                <TableColumn fx:id="colStock" text="STOCK" prefWidth="80.0" />
+                                <TableColumn fx:id="colStock" text="STOCK" prefWidth="90.0" />
 
                             </columns>
 
