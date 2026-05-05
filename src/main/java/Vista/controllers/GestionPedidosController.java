@@ -1,7 +1,7 @@
 package Vista.controllers;
 
-import Modelo.Pedido;
 import Controlador.Controlador;
+import Modelo.Pedido;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
@@ -17,15 +18,26 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Controlador encargado de la gestión de pedidos.
- * Permite visualizar, filtrar, buscar, actualizar estado y gestionar pedidos desde la interfaz JavaFX.
+ *
+ * Además de la tabla principal, incorpora un panel operativo/financiero
+ * con indicadores reales: pedidos totales, pendientes, enviados,
+ * facturación total, facturación mensual, ticket medio y pedido de mayor importe.
  */
 public class GestionPedidosController extends GenericoController<Pedido> {
+
+    private static final DateTimeFormatter FECHA_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @FXML private TableColumn<Pedido, Integer> colId;
     @FXML private TableColumn<Pedido, String> colCliente;
@@ -35,59 +47,94 @@ public class GestionPedidosController extends GenericoController<Pedido> {
     @FXML private TableColumn<Pedido, String> colTotal;
     @FXML private TableColumn<Pedido, String> colEstado;
 
-    private Controlador controladorLogico = new Controlador();
+    @FXML private Label lblTotalPedidos;
+    @FXML private Label lblPedidosPendientes;
+    @FXML private Label lblPedidosEnviados;
+    @FXML private Label lblFacturacionTotal;
+    @FXML private Label lblFacturacionMes;
+    @FXML private Label lblTicketMedio;
+    @FXML private Label lblMayorImporte;
 
-    /**
-     * Configura la tabla de pedidos y define cómo se muestran sus datos.
-     */
+    private final Controlador controladorLogico = new Controlador();
+
     @Override
     protected void configurarVista() {
+        configurarColumnas();
+        configurarFiltros();
+        cargarPedidosInicial();
+    }
 
+    private void configurarColumnas() {
         colId.setCellValueFactory(new PropertyValueFactory<>("numeroPedido"));
 
         colCliente.setCellValueFactory(cellData ->
-                new SimpleStringProperty(
-                        cellData.getValue().getCliente() == null
-                                ? ""
-                                : cellData.getValue().getCliente().getNombre()
-                )
+                new SimpleStringProperty(nombreCliente(cellData.getValue()))
         );
 
         colArticulo.setCellValueFactory(cellData ->
-                new SimpleStringProperty(
-                        cellData.getValue().getArticulo() == null
-                                ? ""
-                                : cellData.getValue().getArticulo().getDescripcion()
-                )
+                new SimpleStringProperty(descripcionArticulo(cellData.getValue()))
         );
 
         colCant.setCellValueFactory(cellData ->
-                new SimpleStringProperty(String.valueOf(cellData.getValue().getCantidad()))
+                new SimpleStringProperty(String.valueOf(cantidadSegura(cellData.getValue())))
         );
 
         colFecha.setCellValueFactory(cellData ->
-                new SimpleStringProperty(
-                        cellData.getValue().getFechaHora() == null
-                                ? ""
-                                : cellData.getValue().getFechaHora().toString()
-                )
+                new SimpleStringProperty(formatearFecha(cellData.getValue()))
         );
 
         colTotal.setCellValueFactory(cellData ->
-                new SimpleStringProperty(String.format("%.2f €", cellData.getValue().calcularTotal()))
+                new SimpleStringProperty(formatoMoneda(calcularTotalSeguro(cellData.getValue())))
         );
 
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        colEstado.setCellFactory(tc -> new TableCell<>() {
+            @Override
+            protected void updateItem(String estado, boolean empty) {
+                super.updateItem(estado, empty);
 
-        comboFiltro.getItems().clear();
-        comboFiltro.getItems().addAll("Todos los pedidos", "Pendientes", "Enviados");
+                if (empty || estado == null) {
+                    setText(null);
+                    setStyle("");
+                    return;
+                }
+
+                String estadoNormalizado = estado.trim().toUpperCase(Locale.ROOT);
+                setText(estadoNormalizado);
+
+                if ("PENDIENTE".equals(estadoNormalizado)) {
+                    setStyle("-fx-text-fill: #ffd166; -fx-font-weight: bold;");
+                } else if ("ENVIADO".equals(estadoNormalizado)) {
+                    setStyle("-fx-text-fill: #4dffd2; -fx-font-weight: bold;");
+                } else if ("CANCELADO".equals(estadoNormalizado)) {
+                    setStyle("-fx-text-fill: #ff5c7a; -fx-font-weight: bold;");
+                } else {
+                    setStyle("-fx-text-fill: #dceff8; -fx-font-weight: bold;");
+                }
+            }
+        });
 
         tvTabla.setPlaceholder(new Label("Selecciona un filtro para visualizar los pedidos."));
     }
 
-    /**
-     * Filtra los pedidos según su estado.
-     */
+    private void configurarFiltros() {
+        comboFiltro.getItems().clear();
+        comboFiltro.getItems().addAll("Todos los pedidos", "Pendientes", "Enviados");
+    }
+
+    private void cargarPedidosInicial() {
+        try {
+            List<Pedido> todos = controladorLogico.getListaPedidos();
+            tvTabla.setItems(FXCollections.observableArrayList(todos));
+            actualizarPanelPedidos(todos);
+            comboFiltro.setValue("Todos los pedidos");
+        } catch (Exception e) {
+            System.err.println("Error al cargar pedidos iniciales: " + e.getMessage());
+            mostrarMensaje("ERROR: No se pudo cargar el listado de pedidos.");
+            actualizarPanelPedidos(List.of());
+        }
+    }
+
     @Override
     protected void filtrar() {
         String seleccion = comboFiltro.getValue();
@@ -99,23 +146,24 @@ public class GestionPedidosController extends GenericoController<Pedido> {
 
             if ("Pendientes".equals(seleccion)) {
                 listaFiltrada = todos.stream()
-                        .filter(p -> "PENDIENTE".equalsIgnoreCase(p.getEstado()))
+                        .filter(p -> "PENDIENTE".equalsIgnoreCase(estadoSeguro(p)))
                         .collect(Collectors.toList());
 
             } else if ("Enviados".equals(seleccion)) {
                 listaFiltrada = todos.stream()
-                        .filter(p -> "ENVIADO".equalsIgnoreCase(p.getEstado()))
+                        .filter(p -> "ENVIADO".equalsIgnoreCase(estadoSeguro(p)))
                         .collect(Collectors.toList());
 
             } else {
                 listaFiltrada = todos;
             }
 
+            tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
+            actualizarPanelPedidos(todos);
+
             if (listaFiltrada.isEmpty()) {
-                tvTabla.setItems(FXCollections.observableArrayList());
                 mostrarMensaje("No hay pedidos con el estado: " + seleccion);
             } else {
-                tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
                 mostrarMensaje("Mostrando pedidos correctamente.");
             }
 
@@ -128,29 +176,23 @@ public class GestionPedidosController extends GenericoController<Pedido> {
     /**
      * Realiza una búsqueda de pedidos únicamente por ID del pedido o por nombre del cliente.
      *
-     * La búsqueda ignora mayúsculas y minúsculas en el nombre del cliente.
-     *
      * @param texto texto introducido por el usuario en el buscador
      */
     @Override
     protected void realizarBusquedaEspecifica(String texto) {
         try {
             String criterio = normalizarTexto(texto);
-
             List<Pedido> todos = controladorLogico.getListaPedidos();
 
             List<Pedido> resultados = todos.stream()
                     .filter(p ->
                             String.valueOf(p.getNumeroPedido()).contains(criterio)
-                                    || normalizarTexto(
-                                    p.getCliente() == null
-                                            ? ""
-                                            : p.getCliente().getNombre()
-                            ).contains(criterio)
+                                    || normalizarTexto(nombreCliente(p)).contains(criterio)
                     )
                     .collect(Collectors.toList());
 
             tvTabla.setItems(FXCollections.observableArrayList(resultados));
+            actualizarPanelPedidos(todos);
 
             if (resultados.isEmpty()) {
                 mostrarMensaje("No se encontraron pedidos para: " + texto);
@@ -164,19 +206,148 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         }
     }
 
-    /**
-     * Normaliza un texto para realizar comparaciones seguras durante la búsqueda.
-     *
-     * @param valor texto original
-     * @return texto normalizado en minúsculas y sin espacios externos
-     */
+    private void actualizarPanelPedidos(List<Pedido> pedidos) {
+        if (pedidos == null) {
+            pedidos = List.of();
+        }
+
+        int totalPedidos = pedidos.size();
+        int pendientes = 0;
+        int enviados = 0;
+        int pedidosFacturables = 0;
+
+        BigDecimal facturacionTotal = BigDecimal.ZERO;
+        BigDecimal facturacionMes = BigDecimal.ZERO;
+
+        LocalDateTime inicioMes = LocalDateTime.now()
+                .withDayOfMonth(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+
+        for (Pedido pedido : pedidos) {
+            String estado = estadoSeguro(pedido);
+
+            if ("PENDIENTE".equalsIgnoreCase(estado)) {
+                pendientes++;
+            }
+
+            if ("ENVIADO".equalsIgnoreCase(estado)) {
+                enviados++;
+            }
+
+            if (!"CANCELADO".equalsIgnoreCase(estado)) {
+                BigDecimal totalPedido = calcularTotalSeguro(pedido);
+                facturacionTotal = facturacionTotal.add(totalPedido);
+                pedidosFacturables++;
+
+                if (pedido.getFechaHora() != null && !pedido.getFechaHora().isBefore(inicioMes)) {
+                    facturacionMes = facturacionMes.add(totalPedido);
+                }
+            }
+        }
+
+        BigDecimal ticketMedio = pedidosFacturables == 0
+                ? BigDecimal.ZERO
+                : facturacionTotal.divide(BigDecimal.valueOf(pedidosFacturables), 2, RoundingMode.HALF_UP);
+
+        Optional<Pedido> mayorImporte = pedidos.stream()
+                .filter(p -> !"CANCELADO".equalsIgnoreCase(estadoSeguro(p)))
+                .max(Comparator.comparing(this::calcularTotalSeguro));
+
+        setTexto(lblTotalPedidos, String.valueOf(totalPedidos));
+        setTexto(lblPedidosPendientes, pendientes + " pendientes");
+        setTexto(lblPedidosEnviados, enviados + " enviados");
+        setTexto(lblFacturacionTotal, formatoMoneda(facturacionTotal));
+        setTexto(lblFacturacionMes, formatoMoneda(facturacionMes));
+        setTexto(lblTicketMedio, formatoMoneda(ticketMedio));
+
+        if (mayorImporte.isPresent()) {
+            Pedido pedido = mayorImporte.get();
+            setTexto(
+                    lblMayorImporte,
+                    "#" + pedido.getNumeroPedido()
+                            + " · " + nombreCliente(pedido)
+                            + " · " + formatoMoneda(calcularTotalSeguro(pedido))
+            );
+        } else {
+            setTexto(lblMayorImporte, "Sin pedidos facturables");
+        }
+    }
+
     private String normalizarTexto(String valor) {
         return valor == null ? "" : valor.trim().toLowerCase(Locale.ROOT);
     }
 
+    private String nombreCliente(Pedido pedido) {
+        try {
+            if (pedido == null || pedido.getCliente() == null || pedido.getCliente().getNombre() == null) {
+                return "";
+            }
+            return pedido.getCliente().getNombre();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private String descripcionArticulo(Pedido pedido) {
+        try {
+            if (pedido == null || pedido.getArticulo() == null || pedido.getArticulo().getDescripcion() == null) {
+                return "";
+            }
+            return pedido.getArticulo().getDescripcion();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private int cantidadSegura(Pedido pedido) {
+        if (pedido == null) return 0;
+        return Math.max(0, pedido.getCantidad());
+    }
+
+    private String estadoSeguro(Pedido pedido) {
+        if (pedido == null || pedido.getEstado() == null) {
+            return "";
+        }
+        return pedido.getEstado();
+    }
+
+    private String formatearFecha(Pedido pedido) {
+        if (pedido == null || pedido.getFechaHora() == null) {
+            return "";
+        }
+        return pedido.getFechaHora().format(FECHA_FMT);
+    }
+
+    private BigDecimal calcularTotalSeguro(Pedido pedido) {
+        try {
+            BigDecimal total = pedido.calcularTotal();
+            return total == null ? BigDecimal.ZERO : total;
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    private String formatoMoneda(BigDecimal valor) {
+        if (valor == null) {
+            valor = BigDecimal.ZERO;
+        }
+        return valor.setScale(2, RoundingMode.HALF_UP).toPlainString() + " €";
+    }
+
+    private void setTexto(Label label, String texto) {
+        if (label != null) {
+            label.setText(texto);
+        }
+    }
+
     @Override
     @FXML
-    protected void eliminarElemento() {}
+    protected void eliminarElemento() {
+        // Funcionalidad reservada para la fase correspondiente del equipo.
+    }
 
     /**
      * Abre el formulario para añadir un nuevo pedido.
@@ -185,6 +356,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
     @FXML
     protected void mostrarFormulario() {
         abrirFormulario("/Vista/fxml/formularios/FormularioPedido.fxml", "Nuevo Pedido");
+        cargarPedidosInicial();
     }
 
     /**
@@ -207,7 +379,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             try {
                 controladorLogico.marcarPedidoComoEnviado(seleccionado.getNumeroPedido());
                 mostrarMensaje("Pedido enviado correctamente.");
-                filtrar();
+                cargarPedidosInicial();
 
             } catch (Exception e) {
                 mostrarMensaje("ERROR: " + e.getMessage());
