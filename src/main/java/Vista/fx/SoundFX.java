@@ -7,10 +7,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Motor de sonido sintético para la interfaz.
+ * Motor de sonido sintético para la interfaz JavaFX.
  *
- * Genera sonidos ligeros y tecnológicos sin depender de archivos externos.
- * Los sonidos se ejecutan en segundo plano para no bloquear JavaFX.
+ * Esta versión utiliza una paleta sonora más grave, suave y profesional,
+ * evitando sonidos excesivamente agudos o arcaicos. No requiere archivos
+ * externos, ya que genera las ondas en tiempo real mediante javax.sound.sampled.
  */
 public final class SoundFX {
 
@@ -24,7 +25,8 @@ public final class SoundFX {
 
     private static volatile boolean enabled = true;
 
-    private SoundFX() {}
+    private SoundFX() {
+    }
 
     public static void setEnabled(boolean on) {
         enabled = on;
@@ -34,30 +36,89 @@ public final class SoundFX {
         return enabled;
     }
 
+    /**
+     * Sonido de hover: muy corto, suave y poco invasivo.
+     */
     public static void hover() {
-        sequence(new double[]{1420, 1680}, new int[]{22, 28}, 0.025);
+        if (!enabled) return;
+
+        POOL.submit(() -> {
+            playTone(420, 520, 32, 0.018, 0.06);
+        });
     }
 
+    /**
+     * Sonido de click: más grave, tipo pulsación física digital.
+     */
     public static void click() {
-        sequence(new double[]{720, 1180}, new int[]{36, 42}, 0.055);
+        if (!enabled) return;
+
+        POOL.submit(() -> {
+            playTone(190, 260, 45, 0.045, 0.04);
+            sleep(8);
+            playTone(360, 420, 38, 0.030, 0.03);
+        });
     }
 
+    /**
+     * Sonido de navegación: transición suave y profesional entre pantallas.
+     */
     public static void navigate() {
-        sequence(new double[]{520, 760, 1180}, new int[]{45, 45, 70}, 0.060);
+        if (!enabled) return;
+
+        POOL.submit(() -> {
+            playTone(240, 310, 52, 0.045, 0.04);
+            sleep(10);
+            playTone(330, 420, 58, 0.040, 0.04);
+            sleep(10);
+            playTone(460, 560, 72, 0.032, 0.03);
+        });
     }
 
+    /**
+     * Sonido de éxito: confirmación limpia, cálida y no estridente.
+     */
     public static void success() {
-        sequence(new double[]{660, 880, 1320}, new int[]{55, 55, 90}, 0.070);
+        if (!enabled) return;
+
+        POOL.submit(() -> {
+            playTone(330, 360, 70, 0.045, 0.04);
+            sleep(12);
+            playTone(440, 500, 75, 0.043, 0.04);
+            sleep(12);
+            playTone(590, 660, 95, 0.035, 0.03);
+        });
     }
 
+    /**
+     * Sonido de alerta: grave, serio y corto.
+     */
     public static void alert() {
-        sequence(new double[]{360, 260}, new int[]{95, 130}, 0.080);
+        if (!enabled) return;
+
+        POOL.submit(() -> {
+            playTone(260, 220, 105, 0.055, 0.035);
+            sleep(18);
+            playTone(210, 180, 120, 0.050, 0.025);
+        });
     }
 
+    /**
+     * Sonido de notificación: breve, elegante y moderado.
+     */
     public static void notify_() {
-        sequence(new double[]{1200, 1600}, new int[]{35, 65}, 0.050);
+        if (!enabled) return;
+
+        POOL.submit(() -> {
+            playTone(380, 470, 55, 0.032, 0.035);
+            sleep(10);
+            playTone(520, 610, 65, 0.026, 0.025);
+        });
     }
 
+    /**
+     * Mantiene compatibilidad con llamadas anteriores a sequence().
+     */
     public static void sequence(double[] frequencies, int[] durationsMs, double volume) {
         if (!enabled || frequencies == null || durationsMs == null) return;
 
@@ -65,31 +126,53 @@ public final class SoundFX {
             int length = Math.min(frequencies.length, durationsMs.length);
 
             for (int i = 0; i < length; i++) {
-                playBlocking(frequencies[i], durationsMs[i], volume);
+                playTone(frequencies[i], frequencies[i], durationsMs[i], volume, 0.03);
                 sleep(10);
             }
         });
     }
 
-    private static void playBlocking(double frequency, int durationMs, double volume) {
+    /**
+     * Genera un tono con transición de frecuencia, envolvente suave y armónicos
+     * muy controlados para evitar sonidos agudos o metálicos.
+     *
+     * @param startFrequency frecuencia inicial
+     * @param endFrequency frecuencia final
+     * @param durationMs duración en milisegundos
+     * @param volume volumen general
+     * @param harmonicLevel cantidad de armónico añadido
+     */
+    private static void playTone(
+            double startFrequency,
+            double endFrequency,
+            int durationMs,
+            double volume,
+            double harmonicLevel
+    ) {
         try {
-            int samples = (int) (SAMPLE_RATE * durationMs / 1000);
+            int samples = (int) (SAMPLE_RATE * durationMs / 1000.0);
             byte[] buffer = new byte[samples * 2];
 
-            double durationSeconds = durationMs / 1000.0;
+            double phase = 0.0;
+            double harmonicPhase = 0.0;
 
             for (int i = 0; i < samples; i++) {
-                double t = i / SAMPLE_RATE;
+                double progress = i / (double) Math.max(1, samples - 1);
 
-                double attack = Math.min(1.0, t / Math.max(0.001, durationSeconds * 0.18));
-                double release = Math.min(1.0, (durationSeconds - t) / Math.max(0.001, durationSeconds * 0.32));
-                double envelope = Math.max(0.0, Math.min(attack, release));
+                double frequency = startFrequency + ((endFrequency - startFrequency) * easeOut(progress));
 
-                double base = Math.sin(2 * Math.PI * frequency * t);
-                double harmonic = Math.sin(2 * Math.PI * frequency * 2.01 * t) * 0.20;
-                double shimmer = Math.sin(2 * Math.PI * frequency * 3.02 * t) * 0.08;
+                phase += 2.0 * Math.PI * frequency / SAMPLE_RATE;
+                harmonicPhase += 2.0 * Math.PI * frequency * 1.5 / SAMPLE_RATE;
 
-                double sample = (base * 0.72 + harmonic + shimmer) * envelope;
+                double envelope = envelope(progress);
+
+                double base = Math.sin(phase);
+                double harmonic = Math.sin(harmonicPhase) * harmonicLevel;
+
+                double sample = (base * 0.88 + harmonic) * envelope;
+
+                // Saturación suave para evitar aspereza digital.
+                sample = Math.tanh(sample * 1.15);
 
                 short value = (short) (sample * volume * Short.MAX_VALUE);
 
@@ -107,8 +190,42 @@ public final class SoundFX {
             }
 
         } catch (Exception ignored) {
-            // Si el sistema no permite audio, la interfaz continúa funcionando.
+            // Si el sistema no tiene salida de audio disponible, la app sigue funcionando.
         }
+    }
+
+    /**
+     * Envolvente ADSR simplificada.
+     * Ataque corto y salida suave para eliminar clics y pitidos secos.
+     */
+    private static double envelope(double progress) {
+        double attackEnd = 0.18;
+        double releaseStart = 0.58;
+
+        if (progress < attackEnd) {
+            return smoothStep(progress / attackEnd);
+        }
+
+        if (progress > releaseStart) {
+            double releaseProgress = (progress - releaseStart) / (1.0 - releaseStart);
+            return 1.0 - smoothStep(releaseProgress);
+        }
+
+        return 1.0;
+    }
+
+    private static double smoothStep(double value) {
+        value = clamp(value);
+        return value * value * (3.0 - 2.0 * value);
+    }
+
+    private static double easeOut(double value) {
+        value = clamp(value);
+        return 1.0 - Math.pow(1.0 - value, 2.0);
+    }
+
+    private static double clamp(double value) {
+        return Math.max(0.0, Math.min(1.0, value));
     }
 
     private static void sleep(int ms) {
