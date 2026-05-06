@@ -2,22 +2,26 @@ package Vista.controllers;
 
 import Controlador.Controlador;
 import Modelo.Pedido;
+import Vista.fx.SoundFX;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -128,6 +132,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             tvTabla.setItems(FXCollections.observableArrayList(todos));
             actualizarPanelPedidos(todos);
             comboFiltro.setValue("Todos los pedidos");
+
         } catch (Exception e) {
             System.err.println("Error al cargar pedidos iniciales: " + e.getMessage());
             mostrarMensaje("ERROR: No se pudo cargar el listado de pedidos.");
@@ -173,11 +178,6 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         }
     }
 
-    /**
-     * Realiza una búsqueda de pedidos únicamente por ID del pedido o por nombre del cliente.
-     *
-     * @param texto texto introducido por el usuario en el buscador
-     */
     @Override
     protected void realizarBusquedaEspecifica(String texto) {
         try {
@@ -285,7 +285,9 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             if (pedido == null || pedido.getCliente() == null || pedido.getCliente().getNombre() == null) {
                 return "";
             }
+
             return pedido.getCliente().getNombre();
+
         } catch (Exception e) {
             return "";
         }
@@ -296,7 +298,9 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             if (pedido == null || pedido.getArticulo() == null || pedido.getArticulo().getDescripcion() == null) {
                 return "";
             }
+
             return pedido.getArticulo().getDescripcion();
+
         } catch (Exception e) {
             return "";
         }
@@ -311,6 +315,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         if (pedido == null || pedido.getEstado() == null) {
             return "";
         }
+
         return pedido.getEstado();
     }
 
@@ -318,6 +323,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         if (pedido == null || pedido.getFechaHora() == null) {
             return "";
         }
+
         return pedido.getFechaHora().format(FECHA_FMT);
     }
 
@@ -325,6 +331,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         try {
             BigDecimal total = pedido.calcularTotal();
             return total == null ? BigDecimal.ZERO : total;
+
         } catch (Exception e) {
             return BigDecimal.ZERO;
         }
@@ -334,6 +341,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         if (valor == null) {
             valor = BigDecimal.ZERO;
         }
+
         return valor.setScale(2, RoundingMode.HALF_UP).toPlainString() + " €";
     }
 
@@ -349,9 +357,6 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         // Funcionalidad reservada para la fase correspondiente del equipo.
     }
 
-    /**
-     * Abre el formulario para añadir un nuevo pedido.
-     */
     @Override
     @FXML
     protected void mostrarFormulario() {
@@ -359,9 +364,6 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         cargarPedidosInicial();
     }
 
-    /**
-     * Marca un pedido seleccionado como enviado y actualiza la vista.
-     */
     @FXML
     public void cambiarAEnviado() {
         Pedido seleccionado = tvTabla.getSelectionModel().getSelectedItem();
@@ -387,64 +389,138 @@ public class GestionPedidosController extends GenericoController<Pedido> {
         }
     }
 
-    /**
-     * Muestra una ventana modal de confirmación personalizada.
-     *
-     * @param mensaje mensaje a mostrar en la ventana
-     * @return true si el usuario confirma, false si cancela
-     */
     private boolean mostrarVentanaConfirmacion(String mensaje) {
         final boolean[] resultado = {false};
 
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/Vista/fxml/ConfirmacionDialog.fxml")
-            );
+        Stage stage = new Stage(StageStyle.TRANSPARENT);
+        stage.initModality(Modality.APPLICATION_MODAL);
 
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UNDECORATED);
-
-            Stage primaryStage = (Stage) tvTabla.getScene().getWindow();
-            stage.initOwner(primaryStage);
-
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-
-            root.setStyle("-fx-border-color: #66c0f4; -fx-border-width: 2; -fx-background-color: #1b2838;");
-
-            Label lbl = (Label) root.lookup("#lblMensaje");
-            if (lbl != null) {
-                lbl.setText(mensaje);
-                lbl.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
-            }
-
-            Button btnOk = (Button) root.lookup("#btnAceptar");
-            Button btnCan = (Button) root.lookup("#btnCancelar");
-
-            btnOk.setOnAction(e -> {
-                resultado[0] = true;
-                stage.close();
-            });
-
-            btnCan.setOnAction(e -> {
-                resultado[0] = false;
-                stage.close();
-            });
-
-            stage.setOnShowing(ev -> {
-                stage.setX(primaryStage.getX() + (primaryStage.getWidth() / 2) - 200);
-                stage.setY(primaryStage.getY() + (primaryStage.getHeight() / 2) - 100);
-            });
-
-            stage.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (tvTabla != null && tvTabla.getScene() != null) {
+            stage.initOwner(tvTabla.getScene().getWindow());
         }
 
+        VBox panel = new VBox(22);
+        panel.setPrefWidth(500);
+        panel.setPadding(new Insets(26, 28, 26, 28));
+        panel.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #071321, #030813);" +
+                        "-fx-background-radius: 26;" +
+                        "-fx-border-radius: 26;" +
+                        "-fx-border-color: rgba(0,240,255,0.65);" +
+                        "-fx-border-width: 1.5;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,240,255,0.35), 34, 0.22, 0, 0);"
+        );
+
+        Label titulo = new Label("CONFIRMACIÓN");
+        titulo.setMaxWidth(Double.MAX_VALUE);
+        titulo.setAlignment(Pos.CENTER);
+        titulo.setStyle(
+                "-fx-text-fill: #00f0ff;" +
+                        "-fx-font-size: 22px;" +
+                        "-fx-font-weight: 900;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,240,255,0.55), 12, 0.30, 0, 0);"
+        );
+
+        Label lblMensajeDialogo = new Label(mensaje);
+        lblMensajeDialogo.setWrapText(true);
+        lblMensajeDialogo.setMaxWidth(Double.MAX_VALUE);
+        lblMensajeDialogo.setAlignment(Pos.CENTER);
+        lblMensajeDialogo.setStyle(
+                "-fx-text-fill: #ffffff;" +
+                        "-fx-font-size: 15px;" +
+                        "-fx-font-weight: 650;"
+        );
+
+        HBox botones = new HBox(22);
+        botones.setAlignment(Pos.CENTER);
+
+        StackPane aceptar = crearBotonConfirmacionVisual("ACEPTAR", true);
+        StackPane cancelar = crearBotonConfirmacionVisual("CANCELAR", false);
+
+        aceptar.setOnMouseClicked(e -> {
+            resultado[0] = true;
+            SoundFX.success();
+            stage.close();
+        });
+
+        cancelar.setOnMouseClicked(e -> {
+            resultado[0] = false;
+            SoundFX.click();
+            stage.close();
+        });
+
+        botones.getChildren().addAll(aceptar, cancelar);
+        panel.getChildren().addAll(titulo, lblMensajeDialogo, botones);
+
+        StackPane shell = new StackPane(panel);
+        shell.setPadding(new Insets(28));
+        shell.setStyle("-fx-background-color: transparent;");
+
+        Scene scene = new Scene(shell);
+        scene.setFill(Color.TRANSPARENT);
+
+        stage.setScene(scene);
+        stage.setOnShown(e -> centrarVentanaConfirmacion(stage));
+        stage.showAndWait();
+
         return resultado[0];
+    }
+
+    private StackPane crearBotonConfirmacionVisual(String texto, boolean principal) {
+        Label label = new Label(texto);
+        label.setAlignment(Pos.CENTER);
+        label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        label.setStyle(
+                principal
+                        ? "-fx-text-fill: #031018; -fx-font-size: 13px; -fx-font-weight: 900;"
+                        : "-fx-text-fill: #ff6686; -fx-font-size: 13px; -fx-font-weight: 900;"
+        );
+
+        StackPane boton = new StackPane(label);
+        boton.setMinSize(160, 46);
+        boton.setPrefSize(160, 46);
+        boton.setMaxSize(160, 46);
+        boton.setFocusTraversable(false);
+
+        String estiloNormal = crearEstiloBotonConfirmacion(principal, false);
+        String estiloHover = crearEstiloBotonConfirmacion(principal, true);
+
+        boton.setStyle(estiloNormal);
+        boton.setOnMouseEntered(e -> boton.setStyle(estiloHover));
+        boton.setOnMouseExited(e -> boton.setStyle(estiloNormal));
+
+        return boton;
+    }
+
+    private String crearEstiloBotonConfirmacion(boolean principal, boolean hover) {
+        if (principal) {
+            return (hover
+                    ? "-fx-background-color: linear-gradient(to bottom right, #9dfff2, #20f6ff);"
+                    : "-fx-background-color: linear-gradient(to bottom right, #7ce8ff, #00f0ff);")
+                    + "-fx-background-radius: 14;"
+                    + "-fx-border-radius: 14;"
+                    + "-fx-border-color: rgba(255,255,255,0.32);"
+                    + "-fx-border-width: 1;"
+                    + "-fx-effect: dropshadow(gaussian, rgba(0,240,255,0.36), 16, 0.25, 0, 0);"
+                    + "-fx-cursor: hand;";
+        }
+
+        return (hover
+                ? "-fx-background-color: rgba(255,85,119,0.15);"
+                : "-fx-background-color: rgba(255,85,119,0.08);")
+                + "-fx-background-radius: 14;"
+                + "-fx-border-radius: 14;"
+                + "-fx-border-color: rgba(255,85,119,0.50);"
+                + "-fx-border-width: 1;"
+                + "-fx-cursor: hand;";
+    }
+
+    private void centrarVentanaConfirmacion(Stage stage) {
+        Window owner = stage.getOwner();
+
+        if (owner != null) {
+            stage.setX(owner.getX() + (owner.getWidth() / 2) - (stage.getWidth() / 2));
+            stage.setY(owner.getY() + (owner.getHeight() / 2) - (stage.getHeight() / 2));
+        }
     }
 }
