@@ -1,10 +1,10 @@
-# BugBusters · Producto 4
+# BugBusters · Producto 5
 
 ## Implementación mediante ORM con JPA + Hibernate
 
 **Asignatura:** FP.447 - (P) Programación orientada a objetos con acceso a bases de datos  
 **Institución:** UOC  
-**Proyecto:** BugBusters Producto 4  
+**Proyecto:** BugBusters Producto 5
 **Grupo:** BugBusters  
 
 ---
@@ -12,7 +12,6 @@
 ## Integrantes
 
 - Erick Coll Rodríguez
-- Carles Miguel Millán
 - Ferran Arnaus García
 - Jennifer Hernández Marín
 - Arnau Bordas Fornieles
