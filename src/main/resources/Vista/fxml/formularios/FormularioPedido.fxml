@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<VBox prefWidth="480.0"
-      spacing="20.0"
-      styleClass="root-pane"
-      stylesheets="/Vista/css/estilos.css"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
+<VBox prefWidth="480.0" spacing="25.0" styleClass="vbox-main" stylesheets="/Vista/css/estilos.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="Vista.controllers.formularios.FormularioPedidoController">
+
+    <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+
+    <Label text="NUEVA ORDEN DE PEDIDO" styleClass="label-titulo"/>
+
+    <VBox spacing="10">
+        <Label text="IDENTIFICADOR CLIENTE (EMAIL)" styleClass="dash-eyebrow"/>
+        <TextField fx:id="txtEmailCliente" styleClass="text-field-steam" promptText="cliente@nexus.com"/>
+    </VBox>
+
+    <VBox spacing="10">
+        <Label text="CÓDIGO DE PRODUCTO" styleClass="dash-eyebrow"/>
+        <TextField fx:id="txtCodigoArticulo" styleClass="text-field-steam" promptText="SKU-XXXX"/>
+    </VBox>
+
+    <VBox spacing="10">
+        <Label text="CANTIDAD" styleClass="dash-eyebrow"/>
+        <TextField fx:id="txtCantidad" styleClass="text-field-steam" promptText="1"/>
+    </VBox>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="DESCARTAR" onAction="#cancelar" styleClass="boton-eliminar"/>
+        <Button text="CONFIRMAR PEDIDO" onAction="#guardar" styleClass="boton-resaltado"/>
+    </HBox>
 </VBox>

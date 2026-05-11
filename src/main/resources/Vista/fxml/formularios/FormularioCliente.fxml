@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-
-<VBox prefWidth="480.0"
-      spacing="20.0"
-      styleClass="vbox-main"
-      stylesheets="/Vista/css/estilos.css"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
+<VBox prefWidth="480.0" spacing="20.0" styleClass="vbox-main" stylesheets="/Vista/css/estilos.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="Vista.controllers.formularios.FormularioClienteController">
-</VBox>
 
+    <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+
+    <Label text="REGISTRO DE CLIENTE" styleClass="label-titulo"/>
+
+    <GridPane vgap="15" hgap="15">
+        <columnConstraints>
+            <ColumnConstraints minWidth="120" />
+            <ColumnConstraints hgrow="ALWAYS" />
+        </columnConstraints>
+
+        <children>
+            <Label text="Email (ID):" styleClass="label-cuerpo" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtEmail" styleClass="text-field-steam" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Nombre Completo:" styleClass="label-cuerpo" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtNombre" styleClass="text-field-steam" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Domicilio:" styleClass="label-cuerpo" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtDomicilio" styleClass="text-field-steam" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="NIF:" styleClass="label-cuerpo" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtNif" styleClass="text-field-steam" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label text="Categoría:" styleClass="label-cuerpo" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <HBox spacing="10" GridPane.rowIndex="4" GridPane.columnIndex="1">
+                <Button text="ESTÁNDAR" onAction="#seleccionarEstandar" styleClass="boton-primario" prefWidth="120"/>
+                <Button text="PREMIUM" onAction="#seleccionarPremium" styleClass="boton-primario" prefWidth="120"/>
+            </HBox>
+        </children>
+    </GridPane>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="CANCELAR" onAction="#cancelar" styleClass="boton-eliminar"/>
+        <Button text="REGISTRAR" onAction="#guardar" styleClass="boton-resaltado-alt"/>
+    </HBox>
+</VBox>
