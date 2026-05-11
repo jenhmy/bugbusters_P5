@@ -6,8 +6,10 @@ import Modelo.Excepciones.RecursoNoEncontradoException;
 import Vista.fx.SoundFX;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -321,7 +323,42 @@ public class GestionArticulosController extends GenericoController<Articulo> {
     @Override
     @FXML
     protected void eliminarElemento() {
-        // Funcionalidad reservada para la fase correspondiente del equipo.
+        Articulo seleccionado = tvTabla.getSelectionModel().getSelectedItem();
+
+        if (seleccionado == null) {
+            mostrarMensaje("Por favor, selecciona un artículo de la tabla.");
+            SoundFX.alert();
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vista/fxml/ConfirmacionDialog.fxml"));
+            Parent root = loader.load();
+
+            ConfirmacionController confController = loader.getController();
+            confController.setMensaje("¿Estás seguro de que deseas eliminar el artículo: "
+                    + seleccionado.getDescripcion() + "?");
+
+            Stage stage = new Stage();
+            stage.setTitle("Confirmar Eliminación");
+            stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana principal
+            stage.setScene(new Scene(root));
+
+            stage.showAndWait();
+
+            if (confController.isConfirmado()) {
+                controladorLogico.eliminarArticulo(seleccionado.getCodigo()); // Llamada al controlador JPA
+                SoundFX.success();
+                mostrarMensaje("Artículo eliminado correctamente.");
+
+                cargarCatalogoInicial();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al procesar la eliminación: " + e.getMessage());
+            mostrarMensaje("ERROR: No se pudo eliminar el artículo.");
+            SoundFX.alert();
+        }
     }
 
     @Override

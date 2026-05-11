@@ -6,8 +6,10 @@ import Vista.fx.SoundFX;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -354,7 +356,48 @@ public class GestionPedidosController extends GenericoController<Pedido> {
     @Override
     @FXML
     protected void eliminarElemento() {
-        // Funcionalidad reservada para la fase correspondiente del equipo.
+        Pedido seleccionado = tvTabla.getSelectionModel().getSelectedItem();
+
+        if (seleccionado == null) {
+            mostrarMensaje("Por favor, selecciona un pedido de la tabla.");
+            SoundFX.alert();
+            return;
+        }
+
+        if ("ENVIADO".equalsIgnoreCase(estadoSeguro(seleccionado))) {
+            mostrarMensaje("No se puede eliminar un pedido que ya consta como ENVIADO.");
+            SoundFX.alert();
+            return;
+        }
+
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/Vista/fxml/ConfirmacionDialog.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            ConfirmacionController confController = loader.getController();
+            confController.setMensaje("¿Estás seguro de cancelar el pedido nº " + seleccionado.getNumeroPedido() + "?\n" +
+                    "Se restaurará el stock de: " + descripcionArticulo(seleccionado));
+
+            Stage stage = new Stage();
+            stage.setTitle("Confirmar Cancelación");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            if (confController.isConfirmado()) {
+                controladorLogico.eliminarPedido(seleccionado.getNumeroPedido());
+
+                SoundFX.success();
+                mostrarMensaje("Pedido eliminado y stock restaurado.");
+
+                cargarPedidosInicial();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al eliminar pedido: " + e.getMessage());
+            mostrarMensaje("ERROR: " + e.getMessage());
+            SoundFX.alert();
+        }
     }
 
     @Override
@@ -370,157 +413,43 @@ public class GestionPedidosController extends GenericoController<Pedido> {
 
         if (seleccionado == null) {
             mostrarMensaje("Por favor, selecciona un pedido de la tabla.");
+            SoundFX.alert();
             return;
         }
 
-        boolean confirmar = mostrarVentanaConfirmacion(
-                "¿Marcar pedido #" + seleccionado.getNumeroPedido() + " como ENVIADO?"
-        );
+        if ("ENVIADO".equalsIgnoreCase(estadoSeguro(seleccionado))) {
+            mostrarMensaje("Este pedido ya ha sido enviado.");
+            return;
+        }
 
-        if (confirmar) {
-            try {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vista/fxml/ConfirmacionDialog.fxml"));
+            Parent root = loader.load();
+
+            ConfirmacionController confController = loader.getController();
+            confController.setMensaje("¿Deseas marcar el pedido #" + seleccionado.getNumeroPedido() +
+                    " como ENVIADO?\nEsta acción es irreversible.");
+
+            Stage stage = new Stage();
+            stage.setTitle("Confirmar Envío");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            if (confController.isConfirmado()) {
                 controladorLogico.marcarPedidoComoEnviado(seleccionado.getNumeroPedido());
-                mostrarMensaje("Pedido enviado correctamente.");
+
+                SoundFX.success();
+                mostrarMensaje("Pedido marcado como ENVIADO.");
+
                 cargarPedidosInicial();
-
-            } catch (Exception e) {
-                mostrarMensaje("ERROR: " + e.getMessage());
             }
+
+        } catch (Exception e) {
+            System.err.println("Error al cambiar estado: " + e.getMessage());
+            mostrarMensaje("ERROR: " + e.getMessage());
+            SoundFX.alert();
         }
     }
 
-    private boolean mostrarVentanaConfirmacion(String mensaje) {
-        final boolean[] resultado = {false};
-
-        Stage stage = new Stage(StageStyle.TRANSPARENT);
-        stage.initModality(Modality.APPLICATION_MODAL);
-
-        if (tvTabla != null && tvTabla.getScene() != null) {
-            stage.initOwner(tvTabla.getScene().getWindow());
-        }
-
-        VBox panel = new VBox(22);
-        panel.setPrefWidth(500);
-        panel.setPadding(new Insets(26, 28, 26, 28));
-        panel.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #071321, #030813);" +
-                        "-fx-background-radius: 26;" +
-                        "-fx-border-radius: 26;" +
-                        "-fx-border-color: rgba(0,240,255,0.65);" +
-                        "-fx-border-width: 1.5;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,240,255,0.35), 34, 0.22, 0, 0);"
-        );
-
-        Label titulo = new Label("CONFIRMACIÓN");
-        titulo.setMaxWidth(Double.MAX_VALUE);
-        titulo.setAlignment(Pos.CENTER);
-        titulo.setStyle(
-                "-fx-text-fill: #00f0ff;" +
-                        "-fx-font-size: 22px;" +
-                        "-fx-font-weight: 900;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,240,255,0.55), 12, 0.30, 0, 0);"
-        );
-
-        Label lblMensajeDialogo = new Label(mensaje);
-        lblMensajeDialogo.setWrapText(true);
-        lblMensajeDialogo.setMaxWidth(Double.MAX_VALUE);
-        lblMensajeDialogo.setAlignment(Pos.CENTER);
-        lblMensajeDialogo.setStyle(
-                "-fx-text-fill: #ffffff;" +
-                        "-fx-font-size: 15px;" +
-                        "-fx-font-weight: 650;"
-        );
-
-        HBox botones = new HBox(22);
-        botones.setAlignment(Pos.CENTER);
-
-        StackPane aceptar = crearBotonConfirmacionVisual("ACEPTAR", true);
-        StackPane cancelar = crearBotonConfirmacionVisual("CANCELAR", false);
-
-        aceptar.setOnMouseClicked(e -> {
-            resultado[0] = true;
-            SoundFX.success();
-            stage.close();
-        });
-
-        cancelar.setOnMouseClicked(e -> {
-            resultado[0] = false;
-            SoundFX.click();
-            stage.close();
-        });
-
-        botones.getChildren().addAll(aceptar, cancelar);
-        panel.getChildren().addAll(titulo, lblMensajeDialogo, botones);
-
-        StackPane shell = new StackPane(panel);
-        shell.setPadding(new Insets(28));
-        shell.setStyle("-fx-background-color: transparent;");
-
-        Scene scene = new Scene(shell);
-        scene.setFill(Color.TRANSPARENT);
-
-        stage.setScene(scene);
-        stage.setOnShown(e -> centrarVentanaConfirmacion(stage));
-        stage.showAndWait();
-
-        return resultado[0];
-    }
-
-    private StackPane crearBotonConfirmacionVisual(String texto, boolean principal) {
-        Label label = new Label(texto);
-        label.setAlignment(Pos.CENTER);
-        label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        label.setStyle(
-                principal
-                        ? "-fx-text-fill: #031018; -fx-font-size: 13px; -fx-font-weight: 900;"
-                        : "-fx-text-fill: #ff6686; -fx-font-size: 13px; -fx-font-weight: 900;"
-        );
-
-        StackPane boton = new StackPane(label);
-        boton.setMinSize(160, 46);
-        boton.setPrefSize(160, 46);
-        boton.setMaxSize(160, 46);
-        boton.setFocusTraversable(false);
-
-        String estiloNormal = crearEstiloBotonConfirmacion(principal, false);
-        String estiloHover = crearEstiloBotonConfirmacion(principal, true);
-
-        boton.setStyle(estiloNormal);
-        boton.setOnMouseEntered(e -> boton.setStyle(estiloHover));
-        boton.setOnMouseExited(e -> boton.setStyle(estiloNormal));
-
-        return boton;
-    }
-
-    private String crearEstiloBotonConfirmacion(boolean principal, boolean hover) {
-        if (principal) {
-            return (hover
-                    ? "-fx-background-color: linear-gradient(to bottom right, #9dfff2, #20f6ff);"
-                    : "-fx-background-color: linear-gradient(to bottom right, #7ce8ff, #00f0ff);")
-                    + "-fx-background-radius: 14;"
-                    + "-fx-border-radius: 14;"
-                    + "-fx-border-color: rgba(255,255,255,0.32);"
-                    + "-fx-border-width: 1;"
-                    + "-fx-effect: dropshadow(gaussian, rgba(0,240,255,0.36), 16, 0.25, 0, 0);"
-                    + "-fx-cursor: hand;";
-        }
-
-        return (hover
-                ? "-fx-background-color: rgba(255,85,119,0.15);"
-                : "-fx-background-color: rgba(255,85,119,0.08);")
-                + "-fx-background-radius: 14;"
-                + "-fx-border-radius: 14;"
-                + "-fx-border-color: rgba(255,85,119,0.50);"
-                + "-fx-border-width: 1;"
-                + "-fx-cursor: hand;";
-    }
-
-    private void centrarVentanaConfirmacion(Stage stage) {
-        Window owner = stage.getOwner();
-
-        if (owner != null) {
-            stage.setX(owner.getX() + (owner.getWidth() / 2) - (stage.getWidth() / 2));
-            stage.setY(owner.getY() + (owner.getHeight() / 2) - (stage.getHeight() / 2));
-        }
-    }
 }
