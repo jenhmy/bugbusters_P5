@@ -1,15 +1,22 @@
 package Vista.controllers;
 
 import Controlador.Controlador;
+import Modelo.Articulo;
 import Modelo.Cliente;
 import Modelo.ClientePremium;
+import Vista.fx.SoundFX;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -339,7 +346,42 @@ public class GestionClientesController extends GenericoController<Cliente> {
     @Override
     @FXML
     protected void eliminarElemento() {
-        // Funcionalidad reservada para la fase correspondiente del equipo.
+        Cliente seleccionado = tvTabla.getSelectionModel().getSelectedItem();
+
+        if (seleccionado == null) {
+            mostrarMensaje("Por favor, selecciona un cliente de la tabla.");
+            SoundFX.alert();
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vista/fxml/ConfirmacionDialog.fxml"));
+            Parent root = loader.load();
+
+            ConfirmacionController confController = loader.getController();
+            confController.setMensaje("¿Estás seguro de que deseas eliminar el cliente: "
+                    + seleccionado.getNombre() + " (" + seleccionado.getEmail() + ")?");
+
+            Stage stage = new Stage();
+            stage.setTitle("Confirmar Eliminación");
+            stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana principal
+            stage.setScene(new Scene(root));
+
+            stage.showAndWait();
+
+            if (confController.isConfirmado()) {
+                controladorLogico.eliminarCliente(seleccionado); // Llamada al controlador JPA
+                SoundFX.success();
+                mostrarMensaje("Cliente eliminado correctamente.");
+
+
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al procesar la eliminación: " + e.getMessage());
+            mostrarMensaje("ERROR: No se pudo eliminar el cliente.");
+            SoundFX.alert();
+        }
     }
 
     /**

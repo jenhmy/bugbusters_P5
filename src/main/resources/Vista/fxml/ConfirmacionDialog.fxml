@@ -11,6 +11,7 @@
       stylesheets="/Vista/css/estilos.css"
       xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="Vista.controllers.ConfirmacionController"
       alignment="CENTER"
       prefWidth="400.0"
       style="-fx-border-color: #3a3a3a; -fx-border-width: 2;">
@@ -32,10 +33,12 @@
             <children>
                 <Button fx:id="btnAceptar"
                         text="ACEPTAR"
+                        onAction="#aceptar"
                         styleClass="boton-primario" />
 
                 <Button fx:id="btnCancelar"
                         text="CANCELAR"
+                        onAction="#cancelar"
                         styleClass="boton-eliminar" />
             </children>
         </HBox>
