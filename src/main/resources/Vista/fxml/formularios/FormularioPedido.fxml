@@ -27,8 +27,8 @@
         <TextField fx:id="txtCantidad" styleClass="text-field-steam" promptText="1"/>
     </VBox>
 
-    <HBox spacing="15" alignment="CENTER_RIGHT">
-        <Button text="DESCARTAR" onAction="#cancelar" styleClass="boton-eliminar"/>
+    <HBox spacing="15" alignment="CENTER">
+        <Button text="CANCELAR" onAction="#cancelar" styleClass="boton-eliminar"/>
         <Button text="CONFIRMAR PEDIDO" onAction="#guardar" styleClass="boton-resaltado"/>
     </HBox>
 </VBox>

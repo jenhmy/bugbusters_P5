@@ -33,14 +33,14 @@
 
             <Label text="Categoría:" styleClass="label-cuerpo" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
             <HBox spacing="10" GridPane.rowIndex="4" GridPane.columnIndex="1">
-                <Button text="ESTÁNDAR" onAction="#seleccionarEstandar" styleClass="boton-primario" prefWidth="120"/>
-                <Button text="PREMIUM" onAction="#seleccionarPremium" styleClass="boton-primario" prefWidth="120"/>
+                <Button fx:id="btnEstandar" text="ESTÁNDAR" onAction="#seleccionarEstandar" styleClass="boton-primario" prefWidth="120"/>
+                <Button fx:id="btnPremium" text="PREMIUM" onAction="#seleccionarPremium" styleClass="boton-primario" prefWidth="120"/>
             </HBox>
         </children>
     </GridPane>
 
-    <HBox spacing="15" alignment="CENTER_RIGHT">
+    <HBox spacing="15" alignment="CENTER">
         <Button text="CANCELAR" onAction="#cancelar" styleClass="boton-eliminar"/>
-        <Button text="REGISTRAR" onAction="#guardar" styleClass="boton-resaltado-alt"/>
+        <Button text="REGISTRAR CLIENTE" onAction="#guardar" styleClass="boton-resaltado"/>
     </HBox>
 </VBox>

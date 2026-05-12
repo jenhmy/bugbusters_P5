@@ -42,7 +42,7 @@ public class Main extends Application {
             AmbientOrbs fondoAmbiental = new AmbientOrbs();
             StackPane stackRoot = new StackPane(fondoAmbiental, root);
 
-            Scene scene = new Scene(stackRoot, 1280, 780);
+            Scene scene = new Scene(stackRoot, 1500, 800);
             scene.setFill(Color.web("#02040a"));
 
             URL cssUrl = getClass().getResource(RUTA_CSS);

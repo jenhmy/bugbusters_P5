@@ -20,7 +20,7 @@
 
         <children>
             <Label text="Código:" styleClass="label-cuerpo" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="txtCodigo" styleClass="text-field-steam" promptText="ART-001" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtCodigo" styleClass="text-field-steam" promptText="A001" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
             <Label text="Descripción:" styleClass="label-cuerpo" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
             <TextField fx:id="txtDescripcion" styleClass="text-field-steam" promptText="Descripción del producto" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
@@ -39,7 +39,7 @@
         </children>
     </GridPane>
 
-    <HBox spacing="15" alignment="CENTER_RIGHT">
+    <HBox spacing="15" alignment="CENTER">
         <Button text="CANCELAR" onAction="#cancelar" styleClass="boton-eliminar"/>
         <Button text="GUARDAR ARTÍCULO" onAction="#guardar" styleClass="boton-resaltado"/>
     </HBox>

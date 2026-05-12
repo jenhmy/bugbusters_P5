@@ -125,8 +125,6 @@ public class DashboardWelcome extends VBox {
                 true
         );
 
-        Label tech = label("JavaFX · MVC · JPA/Hibernate · MySQL", "#9ec8dc", 15, true);
-
         lblFecha = label("", "#8eb6ca", 13, true);
         actualizarFecha();
 
@@ -139,13 +137,14 @@ public class DashboardWelcome extends VBox {
                 chip("FACTURACIÓN", "#ff2e88")
         );
 
-        content.getChildren().addAll(overline, title, subtitle, tech, lblFecha, domain);
+        content.getChildren().addAll(overline, title, subtitle, lblFecha, domain);
 
         StackPane panel = depthPanel(content, "#00f0ff", 26);
         panel.setPrefHeight(235);
         panel.setMinHeight(235);
         panel.setMaxHeight(235);
         panel.setMaxWidth(Double.MAX_VALUE);
+        VBox.setMargin(panel, new Insets(0, 0, 10, 0));
 
         return panel;
     }
