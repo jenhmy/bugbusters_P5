@@ -17,6 +17,7 @@ public class FormularioClienteController {
     @FXML private Button btnPremium;
 
     private int tipoClienteSeleccionado = 1; // 1 = Estándar por defecto
+    private boolean exito = false;
 
     @FXML
     public void initialize() {
@@ -56,6 +57,7 @@ public class FormularioClienteController {
                     tipoClienteSeleccionado
             );
 
+            this.exito = true;
             SoundFX.success();
             cerrarVentana();
         } catch (Exception e) {
@@ -73,5 +75,9 @@ public class FormularioClienteController {
     private void cerrarVentana() {
         Stage stage = (Stage) txtEmail.getScene().getWindow();
         stage.close();
+    }
+
+    public boolean isExito() {
+        return exito;
     }
 }

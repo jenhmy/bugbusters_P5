@@ -145,6 +145,7 @@ public class GestionClientesController extends GenericoController<Cliente> {
 
             tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
             actualizarPanelClientes(todos);
+            tvTabla.refresh();
 
             if (listaFiltrada.isEmpty()) {
                 mostrarMensaje("No hay clientes de tipo: " + seleccion);
@@ -372,6 +373,8 @@ public class GestionClientesController extends GenericoController<Cliente> {
             if (confController.isConfirmado()) {
                 controladorLogico.eliminarCliente(seleccionado); // Llamada al controlador JPA
                 SoundFX.success();
+                cargarClientesInicial();
+                filtrar();
                 mostrarMensaje("Cliente eliminado correctamente.");
 
 
@@ -390,7 +393,28 @@ public class GestionClientesController extends GenericoController<Cliente> {
     @Override
     @FXML
     protected void mostrarFormulario() {
-        abrirFormulario("/Vista/fxml/formularios/FormularioCliente.fxml", "Añadir Nuevo Cliente");
-        cargarClientesInicial();
+        SoundFX.click();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vista/fxml/formularios/FormularioCliente.fxml"));
+            Parent root = loader.load();
+            Vista.controllers.formularios.FormularioClienteController controller = loader.getController();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+            stage.showAndWait();
+
+            if (controller.isExito()) {
+                cargarClientesInicial();
+                filtrar();
+                mostrarMensaje("Cliente registrado correctamente.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("ERROR: No se pudo abrir el formulario de clientes.");
+        }
     }
 }
