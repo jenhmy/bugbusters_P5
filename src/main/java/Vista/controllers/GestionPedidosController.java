@@ -167,6 +167,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
 
             tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
             actualizarPanelPedidos(todos);
+            tvTabla.refresh();
 
             if (listaFiltrada.isEmpty()) {
                 mostrarMensaje("No hay pedidos con el estado: " + seleccion);
@@ -388,9 +389,11 @@ public class GestionPedidosController extends GenericoController<Pedido> {
                 controladorLogico.eliminarPedido(seleccionado.getNumeroPedido());
 
                 SoundFX.success();
+                cargarPedidosInicial();
+                filtrar();
                 mostrarMensaje("Pedido eliminado y stock restaurado.");
 
-                cargarPedidosInicial();
+
             }
 
         } catch (Exception e) {
@@ -403,8 +406,30 @@ public class GestionPedidosController extends GenericoController<Pedido> {
     @Override
     @FXML
     protected void mostrarFormulario() {
-        abrirFormulario("/Vista/fxml/formularios/FormularioPedido.fxml", "Nuevo Pedido");
-        cargarPedidosInicial();
+        SoundFX.click();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vista/fxml/formularios/FormularioPedido.fxml"));
+            Parent root = loader.load();
+
+            Vista.controllers.formularios.FormularioPedidoController controller = loader.getController();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+
+            stage.showAndWait();
+
+            if (controller.isExito()) {
+                cargarPedidosInicial();
+                filtrar();
+                mostrarMensaje("Pedido registrado correctamente.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("ERROR: No se pudo abrir el formulario.");
+        }
     }
 
     @FXML
@@ -440,9 +465,11 @@ public class GestionPedidosController extends GenericoController<Pedido> {
                 controladorLogico.marcarPedidoComoEnviado(seleccionado.getNumeroPedido());
 
                 SoundFX.success();
+                cargarPedidosInicial();
+                filtrar();
                 mostrarMensaje("Pedido marcado como ENVIADO.");
 
-                cargarPedidosInicial();
+
             }
 
         } catch (Exception e) {
