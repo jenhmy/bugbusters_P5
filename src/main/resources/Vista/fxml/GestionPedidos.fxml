@@ -32,7 +32,7 @@
 
             <children>
 
-                <Label styleClass="label-titulo" text="GESTIÓN DE PEDIDOS · PANEL OPERATIVO Y FINANCIERO">
+                <Label styleClass="label-titulo" text="GESTIÓN DE PEDIDOS">
                     <VBox.margin>
                         <Insets left="20.0" />
                     </VBox.margin>
