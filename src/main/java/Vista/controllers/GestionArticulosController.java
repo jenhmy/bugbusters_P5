@@ -3,6 +3,7 @@ package Vista.controllers;
 import Controlador.Controlador;
 import Modelo.Articulo;
 import Modelo.Excepciones.RecursoNoEncontradoException;
+import Vista.controllers.formularios.FormularioArticuloController;
 import Vista.fx.SoundFX;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -183,6 +184,7 @@ public class GestionArticulosController extends GenericoController<Articulo> {
 
             tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
             actualizarPanelInventario(todos);
+            tvTabla.refresh();
 
             if (listaFiltrada.isEmpty()) {
                 mostrarMensaje("No se encontraron artículos para el filtro: " + seleccion);
@@ -349,9 +351,10 @@ public class GestionArticulosController extends GenericoController<Articulo> {
             if (confController.isConfirmado()) {
                 controladorLogico.eliminarArticulo(seleccionado.getCodigo()); // Llamada al controlador JPA
                 SoundFX.success();
-                mostrarMensaje("Artículo eliminado correctamente.");
 
                 cargarCatalogoInicial();
+                filtrar();
+                mostrarMensaje("Artículo eliminado correctamente.");
             }
 
         } catch (Exception e) {
@@ -365,8 +368,31 @@ public class GestionArticulosController extends GenericoController<Articulo> {
     @FXML
     protected void mostrarFormulario() {
         SoundFX.click();
-        abrirFormulario("/Vista/fxml/formularios/FormularioArticulos.fxml", "Añadir Nuevo Artículo");
-        cargarCatalogoInicial();
+        try {
+            // Cargamos el formulario manualmente para acceder a su controlador
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vista/fxml/formularios/FormularioArticulos.fxml"));
+            Parent root = loader.load();
+            FormularioArticuloController controller = loader.getController();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+
+            stage.showAndWait();
+
+            if (controller.isExito()) {
+                cargarCatalogoInicial();
+                filtrar();
+                mostrarMensaje("Artículo creado correctamente.");
+            } else {
+                mostrarMensaje("Operación finalizada.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("ERROR: No se pudo abrir el formulario.");
+        }
     }
 
     @FXML
@@ -386,8 +412,9 @@ public class GestionArticulosController extends GenericoController<Articulo> {
         try {
             controladorLogico.sumarStockArticulo(input.codigo(), input.cantidad());
             SoundFX.success();
-            mostrarMensaje("Stock añadido correctamente: +" + input.cantidad() + " uds. (" + input.codigo() + ")");
             cargarCatalogoInicial();
+            filtrar();
+            mostrarMensaje("Stock añadido correctamente: +" + input.cantidad() + " uds. (" + input.codigo() + ")");
 
         } catch (RecursoNoEncontradoException e) {
             SoundFX.alert();
@@ -489,7 +516,6 @@ public class GestionArticulosController extends GenericoController<Articulo> {
             int cantidad = Integer.parseInt(txtCantidad.getText().trim());
 
             resultado[0] = new StockInput(codigo, cantidad);
-            SoundFX.success();
             stage.close();
         });
 
