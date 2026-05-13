@@ -17,6 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -145,6 +146,7 @@ public class GestionClientesController extends GenericoController<Cliente> {
 
             tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
             actualizarPanelClientes(todos);
+            tvTabla.refresh();
 
             if (listaFiltrada.isEmpty()) {
                 mostrarMensaje("No hay clientes de tipo: " + seleccion);
@@ -166,6 +168,10 @@ public class GestionClientesController extends GenericoController<Cliente> {
      */
     @Override
     protected void realizarBusquedaEspecifica(String texto) {
+        if (comboFiltro != null) {
+            comboFiltro.setValue(null);
+            comboFiltro.setValue("Seleccionar filtro");
+        }
         try {
             String criterio = normalizarTexto(texto);
             List<Cliente> todos = controladorLogico.obtenerTodosClientes();
@@ -365,6 +371,7 @@ public class GestionClientesController extends GenericoController<Cliente> {
             Stage stage = new Stage();
             stage.setTitle("Confirmar Eliminación");
             stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana principal
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(new Scene(root));
 
             stage.showAndWait();
@@ -372,9 +379,12 @@ public class GestionClientesController extends GenericoController<Cliente> {
             if (confController.isConfirmado()) {
                 controladorLogico.eliminarCliente(seleccionado); // Llamada al controlador JPA
                 SoundFX.success();
+                cargarClientesInicial();
+                filtrar();
                 mostrarMensaje("Cliente eliminado correctamente.");
-
-
+            } else {
+                mostrarMensaje("Acción cancelada por el usuario.");
+                SoundFX.alert();
             }
 
         } catch (Exception e) {
@@ -390,7 +400,28 @@ public class GestionClientesController extends GenericoController<Cliente> {
     @Override
     @FXML
     protected void mostrarFormulario() {
-        abrirFormulario("/Vista/fxml/formularios/FormularioCliente.fxml", "Añadir Nuevo Cliente");
-        cargarClientesInicial();
+        SoundFX.click();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vista/fxml/formularios/FormularioCliente.fxml"));
+            Parent root = loader.load();
+            Vista.controllers.formularios.FormularioClienteController controller = loader.getController();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+            stage.showAndWait();
+
+            if (controller.isExito()) {
+                cargarClientesInicial();
+                filtrar();
+                mostrarMensaje("Cliente registrado correctamente.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("ERROR: No se pudo abrir el formulario de clientes.");
+        }
     }
 }

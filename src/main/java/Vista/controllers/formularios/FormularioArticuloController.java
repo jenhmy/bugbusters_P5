@@ -17,11 +17,11 @@ public class FormularioArticuloController {
     @FXML private TextField txtStock;
 
     private final Controlador controladorLogico = new Controlador();
+    private boolean exito = false;
 
     @FXML
     private void guardar() {
         try {
-            // Llamamos al método de tu clase Controlador
             controladorLogico.anadirArticulo(
                     txtCodigo.getText(),
                     txtDescripcion.getText(),
@@ -31,12 +31,17 @@ public class FormularioArticuloController {
                     Integer.parseInt(txtStock.getText())
             );
 
+            this.exito = true;
             SoundFX.success();
             cerrarVentana();
         } catch (Exception e) {
             SoundFX.alert();
-            System.err.println("Error al guardar artículo: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
         }
+    }
+
+    public boolean isExito() {
+        return exito;
     }
 
     @FXML

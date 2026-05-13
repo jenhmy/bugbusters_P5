@@ -125,7 +125,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
 
     private void configurarFiltros() {
         comboFiltro.getItems().clear();
-        comboFiltro.getItems().addAll("Todos los pedidos", "Pendientes", "Enviados");
+        comboFiltro.getItems().addAll("Todos", "Pendientes", "Enviados");
     }
 
     private void cargarPedidosInicial() {
@@ -133,7 +133,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             List<Pedido> todos = controladorLogico.getListaPedidos();
             tvTabla.setItems(FXCollections.observableArrayList(todos));
             actualizarPanelPedidos(todos);
-            comboFiltro.setValue("Todos los pedidos");
+            comboFiltro.setValue("Todos");
 
         } catch (Exception e) {
             System.err.println("Error al cargar pedidos iniciales: " + e.getMessage());
@@ -167,6 +167,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
 
             tvTabla.setItems(FXCollections.observableArrayList(listaFiltrada));
             actualizarPanelPedidos(todos);
+            tvTabla.refresh();
 
             if (listaFiltrada.isEmpty()) {
                 mostrarMensaje("No hay pedidos con el estado: " + seleccion);
@@ -182,6 +183,25 @@ public class GestionPedidosController extends GenericoController<Pedido> {
 
     @Override
     protected void realizarBusquedaEspecifica(String texto) {
+        if (comboFiltro != null) {
+            comboFiltro.setValue(null);
+            comboFiltro.setValue("Seleccionar filtroprivate void cargarPedidosInicial() {\n" +
+                    "    try {\n" +
+                    "        List<Pedido> todos = controladorLogico.getListaPedidos();\n" +
+                    "        tvTabla.setItems(FXCollections.observableArrayList(todos));\n" +
+                    "        actualizarPanelPedidos(todos);\n" +
+                    "        \n" +
+                    "        // CAMBIO: En lugar de setValue, lo dejamos a null\n" +
+                    "        comboFiltro.setValue(null); \n" +
+                    "        // Y le ponemos un texto de ayuda si no lo tiene en el FXML\n" +
+                    "        comboFiltro.setPromptText(\"Seleccionar filtro...\");\n" +
+                    "\n" +
+                    "    } catch (Exception e) {\n" +
+                    "        System.err.println(\"Error al cargar pedidos iniciales: \" + e.getMessage());\n" +
+                    "        mostrarMensaje(\"ERROR: No se pudo cargar el listado de pedidos.\");\n" +
+                    "    }\n" +
+                    "}");
+        }
         try {
             String criterio = normalizarTexto(texto);
             List<Pedido> todos = controladorLogico.getListaPedidos();
@@ -388,10 +408,12 @@ public class GestionPedidosController extends GenericoController<Pedido> {
                 controladorLogico.eliminarPedido(seleccionado.getNumeroPedido());
 
                 SoundFX.success();
-                mostrarMensaje("Pedido eliminado y stock restaurado.");
-
                 cargarPedidosInicial();
-            }
+                filtrar();
+                mostrarMensaje("Pedido eliminado y stock restaurado.");
+            } else {
+            mostrarMensaje("Acción cancelada por el usuario.");
+        }
 
         } catch (Exception e) {
             System.err.println("Error al eliminar pedido: " + e.getMessage());
@@ -403,8 +425,30 @@ public class GestionPedidosController extends GenericoController<Pedido> {
     @Override
     @FXML
     protected void mostrarFormulario() {
-        abrirFormulario("/Vista/fxml/formularios/FormularioPedido.fxml", "Nuevo Pedido");
-        cargarPedidosInicial();
+        SoundFX.click();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Vista/fxml/formularios/FormularioPedido.fxml"));
+            Parent root = loader.load();
+
+            Vista.controllers.formularios.FormularioPedidoController controller = loader.getController();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+
+            stage.showAndWait();
+
+            if (controller.isExito()) {
+                cargarPedidosInicial();
+                filtrar();
+                mostrarMensaje("Pedido registrado correctamente.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("ERROR: No se pudo abrir el formulario.");
+        }
     }
 
     @FXML
@@ -433,6 +477,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             Stage stage = new Stage();
             stage.setTitle("Confirmar Envío");
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
@@ -440,9 +485,11 @@ public class GestionPedidosController extends GenericoController<Pedido> {
                 controladorLogico.marcarPedidoComoEnviado(seleccionado.getNumeroPedido());
 
                 SoundFX.success();
+                cargarPedidosInicial();
+                filtrar();
                 mostrarMensaje("Pedido marcado como ENVIADO.");
 
-                cargarPedidosInicial();
+
             }
 
         } catch (Exception e) {

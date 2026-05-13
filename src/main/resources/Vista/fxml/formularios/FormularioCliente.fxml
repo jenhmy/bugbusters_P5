@@ -14,33 +14,33 @@
 
     <GridPane vgap="15" hgap="15">
         <columnConstraints>
-            <ColumnConstraints minWidth="120" />
+            <ColumnConstraints minWidth="140" />
             <ColumnConstraints hgrow="ALWAYS" />
         </columnConstraints>
 
         <children>
             <Label text="Email (ID):" styleClass="label-cuerpo" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="txtEmail" styleClass="text-field-steam" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtEmail" styleClass="text-field-steam" promptText="correo@bugbusters.com" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
             <Label text="Nombre Completo:" styleClass="label-cuerpo" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-            <TextField fx:id="txtNombre" styleClass="text-field-steam" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtNombre" styleClass="text-field-steam" promptText="Nombre y apellidos" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
             <Label text="Domicilio:" styleClass="label-cuerpo" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <TextField fx:id="txtDomicilio" styleClass="text-field-steam" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtDomicilio" styleClass="text-field-steam" promptText="Calle, número, piso, ciudad" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
             <Label text="NIF:" styleClass="label-cuerpo" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-            <TextField fx:id="txtNif" styleClass="text-field-steam" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtNif" styleClass="text-field-steam" promptText="12345678X" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
             <Label text="Categoría:" styleClass="label-cuerpo" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
             <HBox spacing="10" GridPane.rowIndex="4" GridPane.columnIndex="1">
-                <Button text="ESTÁNDAR" onAction="#seleccionarEstandar" styleClass="boton-primario" prefWidth="120"/>
-                <Button text="PREMIUM" onAction="#seleccionarPremium" styleClass="boton-primario" prefWidth="120"/>
+                <Button fx:id="btnEstandar" text="ESTÁNDAR" onAction="#seleccionarEstandar" styleClass="boton-primario" prefWidth="120"/>
+                <Button fx:id="btnPremium" text="PREMIUM" onAction="#seleccionarPremium" styleClass="boton-primario" prefWidth="120"/>
             </HBox>
         </children>
     </GridPane>
 
-    <HBox spacing="15" alignment="CENTER_RIGHT">
+    <HBox spacing="15" alignment="CENTER">
         <Button text="CANCELAR" onAction="#cancelar" styleClass="boton-eliminar"/>
-        <Button text="REGISTRAR" onAction="#guardar" styleClass="boton-resaltado-alt"/>
+        <Button text="REGISTRAR CLIENTE" onAction="#guardar" styleClass="boton-resaltado"/>
     </HBox>
 </VBox>

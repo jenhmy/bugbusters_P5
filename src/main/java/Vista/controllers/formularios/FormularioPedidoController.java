@@ -13,24 +13,33 @@ public class FormularioPedidoController {
     @FXML private TextField txtCantidad;
 
     private final Controlador controladorLogico = new Controlador();
+    private boolean exito = false;
 
     @FXML
     private void guardar() {
         try {
-            // El método anadirPedido ya gestiona internamente la existencia
-            // del cliente, el stock del artículo y la transacción.
+            int cantidad = Integer.parseInt(txtCantidad.getText().trim());
+
             controladorLogico.anadirPedido(
-                    txtEmailCliente.getText(),
-                    txtCodigoArticulo.getText(),
-                    Integer.parseInt(txtCantidad.getText())
+                    txtEmailCliente.getText().trim(),
+                    txtCodigoArticulo.getText().trim(),
+                    cantidad
             );
 
+            this.exito = true;
             SoundFX.success();
             cerrarVentana();
+        } catch (NumberFormatException e) {
+            SoundFX.alert();
+            System.err.println("Error: La cantidad debe ser un número entero.");
         } catch (Exception e) {
             SoundFX.alert();
             System.err.println("Error al procesar pedido: " + e.getMessage());
         }
+    }
+
+    public boolean isExito() {
+        return exito;
     }
 
     @FXML

@@ -10,25 +10,28 @@
 
     <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
 
-    <Label text="NUEVA ORDEN DE PEDIDO" styleClass="label-titulo"/>
+    <Label text="NUEVO PEDIDO" styleClass="label-titulo"/>
 
-    <VBox spacing="10">
-        <Label text="IDENTIFICADOR CLIENTE (EMAIL)" styleClass="dash-eyebrow"/>
-        <TextField fx:id="txtEmailCliente" styleClass="text-field-steam" promptText="cliente@nexus.com"/>
-    </VBox>
+    <GridPane vgap="20" hgap="15">
+        <columnConstraints>
+            <ColumnConstraints minWidth="160" />
+            <ColumnConstraints hgrow="ALWAYS" />
+        </columnConstraints>
 
-    <VBox spacing="10">
-        <Label text="CÓDIGO DE PRODUCTO" styleClass="dash-eyebrow"/>
-        <TextField fx:id="txtCodigoArticulo" styleClass="text-field-steam" promptText="SKU-XXXX"/>
-    </VBox>
+        <children>
+            <Label text="EMAIL CLIENTE:" styleClass="label-cuerpo" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtEmailCliente" styleClass="text-field-steam" promptText="correo@bugbusters.com" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-    <VBox spacing="10">
-        <Label text="CANTIDAD" styleClass="dash-eyebrow"/>
-        <TextField fx:id="txtCantidad" styleClass="text-field-steam" promptText="1"/>
-    </VBox>
+            <Label text="CÓDIGO ARTÍCULO:" styleClass="label-cuerpo" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtCodigoArticulo" styleClass="text-field-steam" promptText="A001" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-    <HBox spacing="15" alignment="CENTER_RIGHT">
-        <Button text="DESCARTAR" onAction="#cancelar" styleClass="boton-eliminar"/>
+            <Label text="CANTIDAD:" styleClass="label-cuerpo" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtCantidad" styleClass="text-field-steam" promptText="1" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        </children>
+    </GridPane>
+
+    <HBox spacing="15" alignment="CENTER">
+        <Button text="CANCELAR" onAction="#cancelar" styleClass="boton-eliminar"/>
         <Button text="CONFIRMAR PEDIDO" onAction="#guardar" styleClass="boton-resaltado"/>
     </HBox>
 </VBox>

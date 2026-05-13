@@ -79,11 +79,11 @@
                         <HBox alignment="CENTER_LEFT" spacing="8.0">
                             <children>
                                 <Circle fx:id="statusDot" radius="4.0" styleClass="status-dot" />
-                                <Label fx:id="lblStatus" styleClass="hud-status" text="SISTEMA EN LÍNEA" />
+                                <Label fx:id="lblStatus" styleClass="hud-status" text="RELOJ" />
                             </children>
                         </HBox>
                         <Label fx:id="lblHora" styleClass="hud-clock" text="--:--:--" />
-                        <Label styleClass="hud-version" text="v 5.0 · BUGBUSTERS CORE" />
+
                     </children>
                     <VBox.margin><Insets bottom="14.0" left="18.0" right="18.0" top="14.0" /></VBox.margin>
                 </VBox>
@@ -91,7 +91,7 @@
                 <!-- BOTÓN SALIR -->
                 <Button fx:id="btnSalir" maxWidth="1.7976931348623157E308"
                         onAction="#salirApp" prefHeight="40.0"
-                        styleClass="boton-salir" text="SALIR">
+                        styleClass="boton-eliminar" text="SALIR">
                     <VBox.margin><Insets bottom="20.0" left="20.0" right="20.0" /></VBox.margin>
                 </Button>
 
