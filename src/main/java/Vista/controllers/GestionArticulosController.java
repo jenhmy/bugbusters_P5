@@ -200,6 +200,10 @@ public class GestionArticulosController extends GenericoController<Articulo> {
 
     @Override
     protected void realizarBusquedaEspecifica(String texto) {
+        if (comboFiltro != null) {
+            comboFiltro.setValue(null);
+            comboFiltro.setValue("Seleccionar filtro");
+        }
         try {
             String criterio = normalizarTexto(texto);
             List<Articulo> todos = controladorLogico.obtenerTodosArticulos();
@@ -343,23 +347,27 @@ public class GestionArticulosController extends GenericoController<Articulo> {
 
             Stage stage = new Stage();
             stage.setTitle("Confirmar Eliminación");
-            stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana principal
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(new Scene(root));
 
             stage.showAndWait();
 
             if (confController.isConfirmado()) {
-                controladorLogico.eliminarArticulo(seleccionado.getCodigo()); // Llamada al controlador JPA
+                controladorLogico.eliminarArticulo(seleccionado.getCodigo());
                 SoundFX.success();
 
                 cargarCatalogoInicial();
                 filtrar();
                 mostrarMensaje("Artículo eliminado correctamente.");
+            } else {
+                mostrarMensaje("Acción cancelada por el usuario.");
+                SoundFX.alert();
             }
 
         } catch (Exception e) {
             System.err.println("Error al procesar la eliminación: " + e.getMessage());
-            mostrarMensaje("ERROR: No se pudo eliminar el artículo.");
+            mostrarMensaje("No se puede eliminar el artículo porque tiene pedidos asociados.");
             SoundFX.alert();
         }
     }
@@ -504,19 +512,40 @@ public class GestionArticulosController extends GenericoController<Articulo> {
         StackPane cancelar = crearBotonModalVisual("CANCELAR", false, 150, 44);
 
         confirmar.setOnMouseClicked(e -> {
-            String error = validarEntradaStock(txtCodigo.getText(), txtCantidad.getText());
+            String codigo = txtCodigo.getText().trim();
+            String cantidadTexto = txtCantidad.getText().trim();
+
+            // 1. Usamos tu método de validación (vacíos y formato de número)
+            String error = validarEntradaStock(codigo, cantidadTexto);
 
             if (error != null) {
                 mostrarMensaje(error);
                 SoundFX.alert();
-                return;
+                return; // No se cierra: error de formato o campos vacíos
             }
 
-            String codigo = txtCodigo.getText().trim();
-            int cantidad = Integer.parseInt(txtCantidad.getText().trim());
+            try {
+                // 2. Verificamos si el código existe usando lo que tienes
+                // Filtramos la lista de artículos para ver si el código está ahí
+                boolean existe = controladorLogico.obtenerTodosArticulos().stream()
+                        .anyMatch(a -> a.getCodigo().equalsIgnoreCase(codigo));
 
-            resultado[0] = new StockInput(codigo, cantidad);
-            stage.close();
+                if (!existe) {
+                    mostrarMensaje("El código '" + codigo + "' no existe.");
+                    SoundFX.alert();
+                    return; // No se cierra: el código no existe en la base de datos
+                }
+
+                // 3. Si llegamos aquí, el dato es correcto y el artículo EXISTE
+                int cantidad = Integer.parseInt(cantidadTexto);
+                resultado[0] = new StockInput(codigo, cantidad);
+                stage.close(); // Único punto donde se cierra la ventana
+
+            } catch (Exception ex) {
+                mostrarMensaje("Error al validar el artículo.");
+                SoundFX.alert();
+                ex.printStackTrace();
+            }
         });
 
         cancelar.setOnMouseClicked(e -> {

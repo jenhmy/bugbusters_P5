@@ -12,6 +12,15 @@
 USE producto4;
 
 -- =========================================================
+-- LIMPIEZA TOTAL OPCIONAL
+-- Quitar '--' solo si quieres vaciar completamente los datos
+-- =========================================================
+-- SET FOREIGN_KEY_CHECKS = 0;
+-- TRUNCATE TABLE Pedidos;
+-- TRUNCATE TABLE Articulos;
+-- TRUNCATE TABLE Clientes;
+-- SET FOREIGN_KEY_CHECKS = 1;
+-- =========================================================
 -- CLIENTES
 -- =========================================================
 INSERT INTO Clientes (email, nombre, domicilio, nif, tipo_cliente) VALUES
@@ -36,10 +45,10 @@ INSERT INTO Articulos (
 ) VALUES
 ('A001', 'Monitor Samsung 27" QHD', 249.99, 9.50, 10, 12),
 ('A002', 'Teclado Logitech K120 USB', 19.99, 4.99, 20, 30),
-('A003', 'Ratón Logitech G502 Gaming', 59.99, 5.99, 10, 20),
-('A004', 'Portátil Dell 15 5520', 799.99, 12.50, 30, 8),
+('A003', 'Ratón Logitech G502 Gaming', 59.99, 5.99, 10, 2),
+('A004', 'Portátil Dell 15 5520', 799.99, 12.50, 30, 0),
 ('A005', 'Auriculares Sony WH-1000XM5', 349.99, 6.99, 10, 15),
-('A006', 'Disco SSD Samsung 1TB', 109.99, 5.50, 20, 25);
+('A006', 'Disco SSD Samsung 1TB', 109.99, 5.50, 20, 1);
 
 -- =========================================================
 -- PEDIDOS
@@ -49,10 +58,10 @@ INSERT INTO Articulos (
 INSERT INTO Pedidos (id_cliente, id_articulo, cantidad, fecha_hora, estado) VALUES
 (1, 1, 2, '2026-03-20 12:34:25', 'ENVIADO'),
 (2, 3, 1, '2026-03-21 09:15:10', 'ENVIADO'),
-(3, 2, 1, '2026-03-21 18:42:03', 'ENVIADO'),
-(1, 4, 1, '2026-03-22 11:05:47', 'ENVIADO'),
-(4, 5, 2, '2026-03-22 16:20:30', 'ENVIADO'),
-(2, 6, 1, '2026-03-23 10:10:10', 'ENVIADO');
+(3, 3, 1, '2026-04-21 18:42:03', 'ENVIADO'),
+(1, 4, 1, '2026-04-22 11:05:47', 'ENVIADO'),
+(4, 6, 2, '2026-05-22 16:20:30', 'ENVIADO'),
+(2, 6, 1, '2026-05-23 10:10:10', 'ENVIADO');
 
 -- =========================================================
 -- CONSULTAS DE COMPROBACION OPCIONALES
@@ -61,12 +70,3 @@ INSERT INTO Pedidos (id_cliente, id_articulo, cantidad, fecha_hora, estado) VALU
 -- SELECT * FROM Articulos;
 -- SELECT * FROM Pedidos;
 
--- =========================================================
--- LIMPIEZA TOTAL OPCIONAL
--- Quitar '--' solo si quieres vaciar completamente los datos
--- =========================================================
--- SET FOREIGN_KEY_CHECKS = 0;
--- TRUNCATE TABLE Pedidos;
--- TRUNCATE TABLE Articulos;
--- TRUNCATE TABLE Clientes;
--- SET FOREIGN_KEY_CHECKS = 1;

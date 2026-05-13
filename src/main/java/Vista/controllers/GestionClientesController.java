@@ -17,6 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -167,6 +168,10 @@ public class GestionClientesController extends GenericoController<Cliente> {
      */
     @Override
     protected void realizarBusquedaEspecifica(String texto) {
+        if (comboFiltro != null) {
+            comboFiltro.setValue(null);
+            comboFiltro.setValue("Seleccionar filtro");
+        }
         try {
             String criterio = normalizarTexto(texto);
             List<Cliente> todos = controladorLogico.obtenerTodosClientes();
@@ -366,6 +371,7 @@ public class GestionClientesController extends GenericoController<Cliente> {
             Stage stage = new Stage();
             stage.setTitle("Confirmar Eliminación");
             stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana principal
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(new Scene(root));
 
             stage.showAndWait();
@@ -376,8 +382,9 @@ public class GestionClientesController extends GenericoController<Cliente> {
                 cargarClientesInicial();
                 filtrar();
                 mostrarMensaje("Cliente eliminado correctamente.");
-
-
+            } else {
+                mostrarMensaje("Acción cancelada por el usuario.");
+                SoundFX.alert();
             }
 
         } catch (Exception e) {

@@ -125,7 +125,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
 
     private void configurarFiltros() {
         comboFiltro.getItems().clear();
-        comboFiltro.getItems().addAll("Todos los pedidos", "Pendientes", "Enviados");
+        comboFiltro.getItems().addAll("Todos", "Pendientes", "Enviados");
     }
 
     private void cargarPedidosInicial() {
@@ -133,7 +133,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             List<Pedido> todos = controladorLogico.getListaPedidos();
             tvTabla.setItems(FXCollections.observableArrayList(todos));
             actualizarPanelPedidos(todos);
-            comboFiltro.setValue("Todos los pedidos");
+            comboFiltro.setValue("Todos");
 
         } catch (Exception e) {
             System.err.println("Error al cargar pedidos iniciales: " + e.getMessage());
@@ -183,6 +183,25 @@ public class GestionPedidosController extends GenericoController<Pedido> {
 
     @Override
     protected void realizarBusquedaEspecifica(String texto) {
+        if (comboFiltro != null) {
+            comboFiltro.setValue(null);
+            comboFiltro.setValue("Seleccionar filtroprivate void cargarPedidosInicial() {\n" +
+                    "    try {\n" +
+                    "        List<Pedido> todos = controladorLogico.getListaPedidos();\n" +
+                    "        tvTabla.setItems(FXCollections.observableArrayList(todos));\n" +
+                    "        actualizarPanelPedidos(todos);\n" +
+                    "        \n" +
+                    "        // CAMBIO: En lugar de setValue, lo dejamos a null\n" +
+                    "        comboFiltro.setValue(null); \n" +
+                    "        // Y le ponemos un texto de ayuda si no lo tiene en el FXML\n" +
+                    "        comboFiltro.setPromptText(\"Seleccionar filtro...\");\n" +
+                    "\n" +
+                    "    } catch (Exception e) {\n" +
+                    "        System.err.println(\"Error al cargar pedidos iniciales: \" + e.getMessage());\n" +
+                    "        mostrarMensaje(\"ERROR: No se pudo cargar el listado de pedidos.\");\n" +
+                    "    }\n" +
+                    "}");
+        }
         try {
             String criterio = normalizarTexto(texto);
             List<Pedido> todos = controladorLogico.getListaPedidos();
@@ -392,9 +411,9 @@ public class GestionPedidosController extends GenericoController<Pedido> {
                 cargarPedidosInicial();
                 filtrar();
                 mostrarMensaje("Pedido eliminado y stock restaurado.");
-
-
-            }
+            } else {
+            mostrarMensaje("Acción cancelada por el usuario.");
+        }
 
         } catch (Exception e) {
             System.err.println("Error al eliminar pedido: " + e.getMessage());
@@ -458,6 +477,7 @@ public class GestionPedidosController extends GenericoController<Pedido> {
             Stage stage = new Stage();
             stage.setTitle("Confirmar Envío");
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
